@@ -10,9 +10,9 @@
             --card-bg: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #3b82f6; /* Azul bancario */
-            --danger: #ef4444; /* Rojo para deudas */
-            --success: #10b981; /* Verde para saldo */
+            --accent: #3b82f6; 
+            --danger: #ef4444; 
+            --success: #10b981; 
             --input-bg: #0f172a;
             --border: #334155;
         }
@@ -26,15 +26,15 @@
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="number"], input[type="date"], input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        input[type="number"], input[type="text"], input[type="password"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
         input:focus { border-color: var(--accent); }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button { width: 100%; padding: 14px; margin-top: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-primary { background-color: var(--accent); color: white; }
-        .btn-danger-outline { background-color: transparent; border: 1px dashed var(--danger); color: var(--danger); }
         
         .msi-list { margin-top: 15px; }
         .msi-item { background: var(--input-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
@@ -46,10 +46,14 @@
         .summary-box span { display: block; font-size: 13px; color: var(--danger); font-weight: bold; }
         .summary-box .big-number { font-size: 24px; margin-top: 5px; }
 
-        .ia-section { border-left: 4px solid #a855f7; } /* Morado IA */
+        .ia-section { border-left: 4px solid #a855f7; }
         textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 15px; box-sizing: border-box; resize: vertical; min-height: 100px; margin-top: 10px; outline: none; }
         textarea:focus { border-color: #a855f7; }
-        .btn-ia { background-color: #a855f7; color: white; }
+        .btn-ia { background-color: #a855f7; color: white; margin-top: 10px;}
+        
+        #respuestaIA { margin-top: 15px; padding: 15px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; display: none; white-space: pre-wrap; font-size: 15px; line-height: 1.5; color: #e2e8f0; }
+        
+        .api-config { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #a855f7; }
     </style>
 </head>
 <body>
@@ -109,9 +113,7 @@
             <button class="btn-primary" onclick="agregarMSI()" style="margin-top: 15px;">Añadir Compra a Meses</button>
         </div>
 
-        <div class="msi-list" id="listaMSI">
-            <!-- Los items de MSI aparecerán aquí -->
-        </div>
+        <div class="msi-list" id="listaMSI"></div>
 
         <div class="summary-box" id="msiResumen" style="display: none;">
             <span>Carga Mensual Fija por Compras a Meses:</span>
@@ -119,14 +121,23 @@
         </div>
     </div>
 
-    <!-- SECCIÓN 4: EL ASESOR IA (INTERFAZ BASE) -->
+    <!-- SECCIÓN 4: EL ASESOR IA -->
     <div class="card ia-section">
         <h2 style="color: #a855f7;">🧠 Consulta al Asesor Estricto</h2>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Hazle una pregunta sobre una compra que quieres hacer. Analizará tus saldos, tu fecha de corte y tu carga de meses sin intereses para regañarte o darte luz verde.</p>
         
-        <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos audífonos de $800 a 3 meses sin intereses. ¿Cómo ves, me conviene?"></textarea>
+        <div class="api-config">
+            <label style="color: #a855f7; margin-top: 0;">🔑 Llave de Conexión (API Key Gemini)</label>
+            <input type="password" id="apiKey" placeholder="Pega aquí tu API Key" onchange="guardarDatos()">
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 0;">Se guarda solo en tu celular. Tu código es seguro.</p>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Hazle una pregunta sobre una compra que quieres hacer. Analizará tus saldos, fecha de corte y carga de meses sin intereses para darte un consejo directo y regañarte si te quieres pasar.</p>
         
-        <button class="btn-ia" onclick="preguntarIA()">Preguntar (Próximamente)</button>
+        <textarea id="preguntaIA" placeholder="Ej. Quiero comprar una chamarra de $1,200 a 3 meses sin intereses. ¿Me conviene?"></textarea>
+        
+        <button class="btn-ia" id="btnPreguntar" onclick="preguntarIA()">Consultar al Asesor</button>
+        
+        <div id="respuestaIA"></div>
     </div>
 
 </div>
@@ -134,31 +145,26 @@
 <script>
     // --- BASE DE DATOS LOCAL ---
     let datosFinancieros = JSON.parse(localStorage.getItem('ia_finanzas_v1')) || {
-        saldoDebito: '',
-        limiteTdc: '',
-        deudaTdc: '',
-        diaCorte: '',
-        diaPago: '',
-        msi: []
+        saldoDebito: '', limiteTdc: '', deudaTdc: '', diaCorte: '', diaPago: '', msi: [], apiKey: ''
     };
 
-    // Cargar datos al abrir
     function cargarUI() {
         document.getElementById('saldoDebito').value = datosFinancieros.saldoDebito;
         document.getElementById('limiteTdc').value = datosFinancieros.limiteTdc;
         document.getElementById('deudaTdc').value = datosFinancieros.deudaTdc;
         document.getElementById('diaCorte').value = datosFinancieros.diaCorte;
         document.getElementById('diaPago').value = datosFinancieros.diaPago;
+        document.getElementById('apiKey').value = datosFinancieros.apiKey || '';
         renderMSI();
     }
 
-    // Guardar cambios en inputs básicos
     function guardarDatos() {
         datosFinancieros.saldoDebito = document.getElementById('saldoDebito').value;
         datosFinancieros.limiteTdc = document.getElementById('limiteTdc').value;
         datosFinancieros.deudaTdc = document.getElementById('deudaTdc').value;
         datosFinancieros.diaCorte = document.getElementById('diaCorte').value;
         datosFinancieros.diaPago = document.getElementById('diaPago').value;
+        datosFinancieros.apiKey = document.getElementById('apiKey').value;
         localStorage.setItem('ia_finanzas_v1', JSON.stringify(datosFinancieros));
     }
 
@@ -169,34 +175,21 @@
         let plazo = parseInt(document.getElementById('msiPlazo').value);
 
         if(concepto === '' || isNaN(total) || isNaN(plazo) || total <= 0 || plazo <= 0) {
-            alert("Por favor llena bien los datos de la compra a meses.");
-            return;
+            alert("Por favor llena bien los datos de la compra a meses."); return;
         }
 
         let pagoMensual = total / plazo;
-
-        datosFinancieros.msi.push({
-            concepto: concepto,
-            total: total,
-            plazo: plazo,
-            pagoMensual: pagoMensual
-        });
-
+        datosFinancieros.msi.push({ concepto: concepto, total: total, plazo: plazo, pagoMensual: pagoMensual });
         guardarDatos();
         
-        // Limpiar inputs
-        document.getElementById('msiConcepto').value = '';
-        document.getElementById('msiTotal').value = '';
-        document.getElementById('msiPlazo').value = '';
-        
+        document.getElementById('msiConcepto').value = ''; document.getElementById('msiTotal').value = ''; document.getElementById('msiPlazo').value = '';
         renderMSI();
     }
 
     function borrarMSI(index) {
         if(confirm("¿Ya liquidaste esta compra a meses?")) {
             datosFinancieros.msi.splice(index, 1);
-            guardarDatos();
-            renderMSI();
+            guardarDatos(); renderMSI();
         }
     }
 
@@ -204,41 +197,90 @@
         let contenedor = document.getElementById('listaMSI');
         let resumen = document.getElementById('msiResumen');
         let totalMensual = document.getElementById('msiTotalMensual');
-        
-        contenedor.innerHTML = '';
-        let sumaMensual = 0;
+        contenedor.innerHTML = ''; let sumaMensual = 0;
 
-        if(datosFinancieros.msi.length === 0) {
-            resumen.style.display = 'none';
-            return;
-        }
+        if(datosFinancieros.msi.length === 0) { resumen.style.display = 'none'; return; }
 
         datosFinancieros.msi.forEach((item, index) => {
             sumaMensual += item.pagoMensual;
             contenedor.innerHTML += `
                 <div class="msi-item">
-                    <div class="msi-info">
-                        <h4>${item.concepto}</h4>
-                        <p>Deuda Total: $${item.total.toFixed(2)} a ${item.plazo} meses</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="msi-amount">-$${item.pagoMensual.toFixed(2)} /mes</div>
+                    <div class="msi-info"><h4>${item.concepto}</h4><p>Deuda Total: $${item.total.toFixed(2)} a ${item.plazo} meses</p></div>
+                    <div style="text-align: right;"><div class="msi-amount">-$${item.pagoMensual.toFixed(2)} /mes</div>
                         <button onclick="borrarMSI(${index})" style="background: none; color: var(--text-muted); border: none; font-size: 12px; margin: 0; padding: 5px 0 0 0; width: auto; font-weight: normal;">🗑️ Quitar</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
-
-        resumen.style.display = 'block';
-        totalMensual.innerText = `$${sumaMensual.toFixed(2)}`;
+        resumen.style.display = 'block'; totalMensual.innerText = `$${sumaMensual.toFixed(2)}`;
     }
 
-    // Placeholder para la futura IA
-    function preguntarIA() {
-        alert("¡Aquí es donde conectaremos el Prompt Maestro con la API del Asesor Regañón en el siguiente paso!");
+    // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
+    async function preguntarIA() {
+        let pregunta = document.getElementById('preguntaIA').value.trim();
+        let apiKey = document.getElementById('apiKey').value.trim();
+
+        if(!apiKey) { alert("⚠️ Primero debes pegar tu API Key en la configuración de arriba."); return; }
+        if(!pregunta) { alert("Escribe qué es lo que quieres comprar o preguntar."); return; }
+
+        let btn = document.getElementById('btnPreguntar');
+        let respDiv = document.getElementById('respuestaIA');
+        
+        // Estado de carga
+        btn.innerText = "Calculando regaño...";
+        btn.disabled = true;
+        respDiv.style.display = 'block';
+        respDiv.innerHTML = "<i>Revisando tus números...</i>";
+
+        // Obtener la carga mensual matemática
+        let cargaMsi = datosFinancieros.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
+
+        // 🧠 EL PROMPT MAESTRO
+        let promptMaestro = `Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México.
+El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
+
+Considera estos datos financieros actuales del usuario antes de responder:
+- Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
+- Límite de su Tarjeta de Crédito: $${datosFinancieros.limiteTdc || 0}
+- Deuda actual en su Tarjeta: $${datosFinancieros.deudaTdc || 0}
+- Día de corte: ${datosFinancieros.diaCorte || 'No definido'}
+- Día límite de pago: ${datosFinancieros.diaPago || 'No definido'}
+- Carga mensual actual por meses sin intereses: $${cargaMsi.toFixed(2)}
+
+INSTRUCCIONES PARA TU RESPUESTA:
+1. Haz un análisis matemático rápido de cómo impacta esta compra.
+2. Si es una mala idea financiera, regáñalo de forma directa y explícale con sus propios números por qué se va a asfixiar financieramente.
+3. Si la compra es viable, dale luz verde pero adviértele de los riesgos de confiarse.
+4. No uses saludos largos, ve directo al grano. Formatea tu respuesta de forma limpia, puedes usar listas o negritas.`;
+
+        try {
+            // Llamada oficial a la API de Gemini 1.5 Flash
+            let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptMaestro }] }]
+                })
+            });
+            
+            let data = await response.json();
+            
+            if(data.error) {
+                respDiv.innerHTML = `<span style="color: #ef4444;">Error: Verifica que tu API Key sea correcta. (${data.error.message})</span>`;
+            } else {
+                let respuestaIA = data.candidates[0].content.parts[0].text;
+                // Formatear negritas básicas para HTML
+                respuestaIA = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                respuestaIA = respuestaIA.replace(/\*(.*?)\*/g, '<i>$1</i>');
+                respDiv.innerHTML = respuestaIA;
+            }
+        } catch (error) {
+            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet o intenta de nuevo.</span>`;
+        }
+        
+        btn.innerText = "Consultar al Asesor";
+        btn.disabled = false;
     }
 
-    // Inicializar
     cargarUI();
 </script>
 </body>
