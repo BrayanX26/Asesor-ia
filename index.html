@@ -215,68 +215,35 @@
     }
 
     // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
-    async function preguntarIA() {
-        let pregunta = document.getElementById('preguntaIA').value.trim();
+        async function preguntarIA() {
         let apiKey = document.getElementById('apiKey').value.trim();
-
-        if(!apiKey) { alert("⚠️ Primero debes pegar tu API Key en la configuración de arriba."); return; }
-        if(!pregunta) { alert("Escribe qué es lo que quieres comprar o preguntar."); return; }
+        if(!apiKey) { alert("⚠️ Pega tu API Key arriba."); return; }
 
         let btn = document.getElementById('btnPreguntar');
         let respDiv = document.getElementById('respuestaIA');
         
-        // Estado de carga
-        btn.innerText = "Calculando regaño...";
+        btn.innerText = "Hackeando a Google...";
         btn.disabled = true;
         respDiv.style.display = 'block';
-        respDiv.innerHTML = "<i>Revisando tus números...</i>";
-
-        // Obtener la carga mensual matemática
-        let cargaMsi = datosFinancieros.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
-
-        // 🧠 EL PROMPT MAESTRO
-        let promptMaestro = `Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México.
-El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
-
-Considera estos datos financieros actuales del usuario antes de responder:
-- Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
-- Límite de su Tarjeta de Crédito: $${datosFinancieros.limiteTdc || 0}
-- Deuda actual en su Tarjeta: $${datosFinancieros.deudaTdc || 0}
-- Día de corte: ${datosFinancieros.diaCorte || 'No definido'}
-- Día límite de pago: ${datosFinancieros.diaPago || 'No definido'}
-- Carga mensual actual por meses sin intereses: $${cargaMsi.toFixed(2)}
-
-INSTRUCCIONES PARA TU RESPUESTA:
-1. Haz un análisis matemático rápido de cómo impacta esta compra.
-2. Si es una mala idea financiera, regáñalo de forma directa y explícale con sus propios números por qué se va a asfixiar financieramente.
-3. Si la compra es viable, dale luz verde pero adviértele de los riesgos de confiarse.
-4. No uses saludos largos, ve directo al grano. Formatea tu respuesta de forma limpia, puedes usar listas o negritas.`;
+        respDiv.innerHTML = "<i>Interrogando a los servidores para ver qué modelos te dejan usar...</i>";
 
         try {
-            // Llamada oficial a la API de Gemini 1.5 Flash
-            let response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey, {
-
-
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptMaestro }] }]
-                })
-            });
-            
+            // Petición especial para que Google nos confiese tus modelos permitidos
+            let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models?key=" + apiKey);
             let data = await response.json();
             
             if(data.error) {
-                respDiv.innerHTML = `<span style="color: #ef4444;">Error: Verifica que tu API Key sea correcta. (${data.error.message})</span>`;
+                respDiv.innerHTML = `<span style="color: #ef4444;">Error de la llave: ${data.error.message}</span>`;
             } else {
-                let respuestaIA = data.candidates[0].content.parts[0].text;
-                // Formatear negritas básicas para HTML
-                respuestaIA = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                respuestaIA = respuestaIA.replace(/\*(.*?)\*/g, '<i>$1</i>');
-                respDiv.innerHTML = respuestaIA;
+                // Filtramos y mostramos solo los que sirven para chatear
+                let modelosValidos = data.models
+                    .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+                    .map(m => `👉 <b>${m.name}</b>`);
+                
+                respDiv.innerHTML = `<span style="color: #10b981;"><b>¡Lista secreta obtenida!</b> Tu cuenta tiene permiso exacto para estos modelos:</span><br><br>${modelosValidos.join('<br>')}<br><br><span style="color:var(--text-muted);">Mándame captura de esto para saber exactamente cuál poner en el código final.</span>`;
             }
         } catch (error) {
-            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet o intenta de nuevo.</span>`;
+            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet.</span>`;
         }
         
         btn.innerText = "Consultar al Asesor";
