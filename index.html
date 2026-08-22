@@ -54,6 +54,12 @@
         #respuestaIA { margin-top: 15px; padding: 15px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; display: none; white-space: pre-wrap; font-size: 15px; line-height: 1.5; color: #e2e8f0; }
         
         .api-config { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #a855f7; }
+
+        /* --- ESTILOS DEL SELECTOR DE TARJETAS --- */
+        .selector-tarjetas { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-tarjeta { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background-color: #1a1a2e; color: #a0a0b0; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
+        .btn-tarjeta.activa.nu { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
+        .btn-tarjeta.activa.mp { background-color: #3b82f6; color: white; border-color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -69,8 +75,16 @@
     </div>
 
     <!-- SECCIÓN 2: TARJETA DE CRÉDITO -->
-    <div class="card" style="border-left-color: var(--danger);">
-        <h2 style="color: var(--danger);">💳 Tarjeta de Crédito (TDC)</h2>
+    <div class="card" id="cardTdc" style="border-left-color: #8b5cf6;">
+        
+        <!-- Selector de Tarjetas -->
+        <div class="selector-tarjetas">
+            <button id="btnNu" class="btn-tarjeta activa nu" onclick="cambiarPestana('Nu')">🟪 Tarjeta Nu</button>
+            <button id="btnMP" class="btn-tarjeta" onclick="cambiarPestana('MP')">🟦 Mercado Pago</button>
+        </div>
+        
+        <h3 id="tituloTarjetaVisual" style="margin-top: 0; color: #8b5cf6;">Datos de Nu</h3>
+
         <div class="grid-2">
             <div>
                 <label>Límite Total ($)</label>
@@ -93,8 +107,8 @@
 
     <!-- SECCIÓN 3: COMPRAS A MESES (MSI) -->
     <div class="card">
-        <h2>🗓️ Compras a Meses (MSI)</h2>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Registra tus compras a meses. La app calculará cuánto de tu tarjeta ya está comprometido cada mes.</p>
+        <h2 id="tituloMsiVisual">🗓️ Compras a Meses (Nu)</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Registra tus compras a meses. Cambia de tarjeta arriba para ver las compras de cada una.</p>
         
         <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px dashed var(--border);">
             <label style="margin-top:0;">¿Qué compraste?</label>
@@ -116,7 +130,7 @@
         <div class="msi-list" id="listaMSI"></div>
 
         <div class="summary-box" id="msiResumen" style="display: none;">
-            <span>Carga Mensual Fija por Compras a Meses:</span>
+            <span>Carga Mensual Fija en esta Tarjeta:</span>
             <div class="big-number" id="msiTotalMensual">$0.00</div>
         </div>
     </div>
@@ -131,9 +145,9 @@
             <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 0;">Se guarda solo en tu celular. Tu código es seguro.</p>
         </div>
 
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Hazle una pregunta sobre una compra que quieres hacer. Analizará tus saldos, fecha de corte y carga de meses sin intereses para darte un consejo directo y regañarte si te quieres pasar.</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">El Asesor analizará AMBAS tarjetas al mismo tiempo y te dirá cuál te conviene usar para tu compra.</p>
         
-        <textarea id="preguntaIA" placeholder="Ej. Quiero comprar una chamarra de $1,200 a 3 meses sin intereses. ¿Me conviene?"></textarea>
+        <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?"></textarea>
         
         <button class="btn-ia" id="btnPreguntar" onclick="preguntarIA()">Consultar al Asesor</button>
         
@@ -143,29 +157,74 @@
 </div>
 
 <script>
-    // --- BASE DE DATOS LOCAL ---
-    let datosFinancieros = JSON.parse(localStorage.getItem('ia_finanzas_v1')) || {
-        saldoDebito: '', limiteTdc: '', deudaTdc: '', diaCorte: '', diaPago: '', msi: [], apiKey: ''
+    // --- BASE DE DATOS LOCAL MULTI-TARJETA (Versión 2) ---
+    // Cambiamos el nombre de guardado a 'ia_finanzas_v2' para no chocar con tu versión anterior
+    let tarjetaActual = 'Nu';
+    let datosFinancieros = JSON.parse(localStorage.getItem('ia_finanzas_v2')) || {
+        saldoDebito: '', apiKey: '',
+        tarjetas: {
+            Nu: { limiteTdc: '', deudaTdc: '', diaCorte: '', diaPago: '', msi: [] },
+            MP: { limiteTdc: '', deudaTdc: '', diaCorte: '', diaPago: '', msi: [] }
+        }
     };
+
+    function cambiarPestana(tarjeta) {
+        guardarDatos(); // Guardamos lo que haya escrito antes de cambiar
+        tarjetaActual = tarjeta;
+        
+        let btnNu = document.getElementById('btnNu');
+        let btnMP = document.getElementById('btnMP');
+        let cardTdc = document.getElementById('cardTdc');
+        let tituloTarjeta = document.getElementById('tituloTarjetaVisual');
+        let tituloMsi = document.getElementById('tituloMsiVisual');
+
+        btnNu.classList.remove('activa', 'nu');
+        btnMP.classList.remove('activa', 'mp');
+        
+        if(tarjeta === 'Nu') {
+            btnNu.classList.add('activa', 'nu');
+            cardTdc.style.borderLeftColor = '#8b5cf6';
+            tituloTarjeta.innerText = 'Datos de Nu';
+            tituloTarjeta.style.color = '#8b5cf6';
+            tituloMsi.innerText = '🗓️ Compras a Meses (Nu)';
+        } else {
+            btnMP.classList.add('activa', 'mp');
+            cardTdc.style.borderLeftColor = '#3b82f6';
+            tituloTarjeta.innerText = 'Datos de Mercado Pago';
+            tituloTarjeta.style.color = '#3b82f6';
+            tituloMsi.innerText = '🗓️ Compras a Meses (Mercado Pago)';
+        }
+
+        cargarDatosEnInputs();
+        renderMSI();
+    }
 
     function cargarUI() {
         document.getElementById('saldoDebito').value = datosFinancieros.saldoDebito;
-        document.getElementById('limiteTdc').value = datosFinancieros.limiteTdc;
-        document.getElementById('deudaTdc').value = datosFinancieros.deudaTdc;
-        document.getElementById('diaCorte').value = datosFinancieros.diaCorte;
-        document.getElementById('diaPago').value = datosFinancieros.diaPago;
         document.getElementById('apiKey').value = datosFinancieros.apiKey || '';
+        cargarDatosEnInputs();
         renderMSI();
+    }
+
+    function cargarDatosEnInputs() {
+        let t = datosFinancieros.tarjetas[tarjetaActual];
+        document.getElementById('limiteTdc').value = t.limiteTdc;
+        document.getElementById('deudaTdc').value = t.deudaTdc;
+        document.getElementById('diaCorte').value = t.diaCorte;
+        document.getElementById('diaPago').value = t.diaPago;
     }
 
     function guardarDatos() {
         datosFinancieros.saldoDebito = document.getElementById('saldoDebito').value;
-        datosFinancieros.limiteTdc = document.getElementById('limiteTdc').value;
-        datosFinancieros.deudaTdc = document.getElementById('deudaTdc').value;
-        datosFinancieros.diaCorte = document.getElementById('diaCorte').value;
-        datosFinancieros.diaPago = document.getElementById('diaPago').value;
         datosFinancieros.apiKey = document.getElementById('apiKey').value;
-        localStorage.setItem('ia_finanzas_v1', JSON.stringify(datosFinancieros));
+        
+        let t = datosFinancieros.tarjetas[tarjetaActual];
+        t.limiteTdc = document.getElementById('limiteTdc').value;
+        t.deudaTdc = document.getElementById('deudaTdc').value;
+        t.diaCorte = document.getElementById('diaCorte').value;
+        t.diaPago = document.getElementById('diaPago').value;
+        
+        localStorage.setItem('ia_finanzas_v2', JSON.stringify(datosFinancieros));
     }
 
     // --- LÓGICA DE MESES SIN INTERESES ---
@@ -179,7 +238,7 @@
         }
 
         let pagoMensual = total / plazo;
-        datosFinancieros.msi.push({ concepto: concepto, total: total, plazo: plazo, pagoMensual: pagoMensual });
+        datosFinancieros.tarjetas[tarjetaActual].msi.push({ concepto: concepto, total: total, plazo: plazo, pagoMensual: pagoMensual });
         guardarDatos();
         
         document.getElementById('msiConcepto').value = ''; document.getElementById('msiTotal').value = ''; document.getElementById('msiPlazo').value = '';
@@ -188,7 +247,7 @@
 
     function borrarMSI(index) {
         if(confirm("¿Ya liquidaste esta compra a meses?")) {
-            datosFinancieros.msi.splice(index, 1);
+            datosFinancieros.tarjetas[tarjetaActual].msi.splice(index, 1);
             guardarDatos(); renderMSI();
         }
     }
@@ -199,23 +258,32 @@
         let totalMensual = document.getElementById('msiTotalMensual');
         contenedor.innerHTML = ''; let sumaMensual = 0;
 
-        if(datosFinancieros.msi.length === 0) { resumen.style.display = 'none'; return; }
+        let msiActual = datosFinancieros.tarjetas[tarjetaActual].msi;
 
-        datosFinancieros.msi.forEach((item, index) => {
+        if(msiActual.length === 0) { resumen.style.display = 'none'; return; }
+
+        let colorAcento = tarjetaActual === 'Nu' ? '#8b5cf6' : '#3b82f6';
+
+        msiActual.forEach((item, index) => {
             sumaMensual += item.pagoMensual;
             contenedor.innerHTML += `
-                <div class="msi-item">
+                <div class="msi-item" style="border-left-color: ${colorAcento};">
                     <div class="msi-info"><h4>${item.concepto}</h4><p>Deuda Total: $${item.total.toFixed(2)} a ${item.plazo} meses</p></div>
                     <div style="text-align: right;"><div class="msi-amount">-$${item.pagoMensual.toFixed(2)} /mes</div>
                         <button onclick="borrarMSI(${index})" style="background: none; color: var(--text-muted); border: none; font-size: 12px; margin: 0; padding: 5px 0 0 0; width: auto; font-weight: normal;">🗑️ Quitar</button>
                     </div>
                 </div>`;
         });
-        resumen.style.display = 'block'; totalMensual.innerText = `$${sumaMensual.toFixed(2)}`;
+        resumen.style.display = 'block'; 
+        totalMensual.innerText = `$${sumaMensual.toFixed(2)}`;
+        totalMensual.style.color = colorAcento;
+        resumen.style.backgroundColor = tarjetaActual === 'Nu' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)';
+        resumen.style.borderColor = tarjetaActual === 'Nu' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)';
     }
 
     // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
-            async function preguntarIA() {
+    async function preguntarIA() {
+        guardarDatos(); // Asegurar que todo esté guardado antes de preguntar
         let pregunta = document.getElementById('preguntaIA').value.trim();
         let apiKey = document.getElementById('apiKey').value.trim();
 
@@ -225,35 +293,46 @@
         let btn = document.getElementById('btnPreguntar');
         let respDiv = document.getElementById('respuestaIA');
         
-        // Estado de carga
-        btn.innerText = "Calculando regaño...";
+        btn.innerText = "Calculando estrategia...";
         btn.disabled = true;
         respDiv.style.display = 'block';
-        respDiv.innerHTML = "<i>Revisando tus números...</i>";
+        respDiv.innerHTML = "<i>Analizando ambas tarjetas...</i>";
 
-        // Obtener la carga mensual matemática
-        let cargaMsi = datosFinancieros.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
+        // Obtener datos de ambas tarjetas
+        let Nu = datosFinancieros.tarjetas.Nu;
+        let MP = datosFinancieros.tarjetas.MP;
+        
+        let cargaNu = Nu.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
+        let cargaMP = MP.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
 
-        // 🧠 EL PROMPT MAESTRO
+        // 🧠 EL NUEVO PROMPT MAESTRO ESTRATEGA
         let promptMaestro = `Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México.
 El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
 
 Considera estos datos financieros actuales del usuario antes de responder:
 - Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
-- Límite de su Tarjeta de Crédito: $${datosFinancieros.limiteTdc || 0}
-- Deuda actual en su Tarjeta: $${datosFinancieros.deudaTdc || 0}
-- Día de corte: ${datosFinancieros.diaCorte || 'No definido'}
-- Día límite de pago: ${datosFinancieros.diaPago || 'No definido'}
-- Carga mensual actual por meses sin intereses: $${cargaMsi.toFixed(2)}
+
+TARJETA NU:
+- Límite: $${Nu.limiteTdc || 0}
+- Deuda actual: $${Nu.deudaTdc || 0}
+- Día de corte: ${Nu.diaCorte || 'No definido'}
+- Día límite de pago: ${Nu.diaPago || 'No definido'}
+- Carga mensual actual por MSI: $${cargaNu.toFixed(2)}
+
+TARJETA MERCADO PAGO:
+- Límite: $${MP.limiteTdc || 0}
+- Deuda actual: $${MP.deudaTdc || 0}
+- Día de corte: ${MP.diaCorte || 'No definido'}
+- Día límite de pago: ${MP.diaPago || 'No definido'}
+- Carga mensual actual por MSI: $${cargaMP.toFixed(2)}
 
 INSTRUCCIONES PARA TU RESPUESTA:
-1. Haz un análisis matemático rápido de cómo impacta esta compra.
-2. Si es una mala idea financiera, regáñalo de forma directa y explícale con sus propios números por qué se va a asfixiar financieramente.
-3. Si la compra es viable, dale luz verde pero adviértele de los riesgos de confiarse.
-4. No uses saludos largos, ve directo al grano. Formatea tu respuesta de forma limpia, puedes usar listas o negritas.`;
+1. Haz un análisis matemático rápido considerando qué tarjeta le conviene más usar basándote en sus días de corte (para darle más días de financiamiento) y su límite disponible.
+2. Si la compra es mala idea, regáñalo directo usando los números de su peor tarjeta.
+3. Si la compra es viable, dile EXACTAMENTE con cuál de las dos tarjetas (Nu o Mercado Pago) le conviene hacerla y por qué.
+4. No uses saludos largos, ve directo al grano. Formatea tu respuesta de forma limpia (usa listas y negritas).`;
 
         try {
-            // ¡EL MODELO CORRECTO DE TU LISTA!
             let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -268,7 +347,6 @@ INSTRUCCIONES PARA TU RESPUESTA:
                 respDiv.innerHTML = `<span style="color: #ef4444;">Error de Google: ${data.error.message}</span>`;
             } else {
                 let respuestaIA = data.candidates[0].content.parts[0].text;
-                // Formatear negritas básicas para HTML
                 respuestaIA = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 respuestaIA = respuestaIA.replace(/\*(.*?)\*/g, '<i>$1</i>');
                 respDiv.innerHTML = respuestaIA;
@@ -285,3 +363,4 @@ INSTRUCCIONES PARA TU RESPUESTA:
 </script>
 </body>
 </html>
+
