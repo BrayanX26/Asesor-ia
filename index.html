@@ -26,8 +26,8 @@
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="number"], input[type="text"], input[type="password"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        input:focus { border-color: var(--accent); }
+        input[type="number"], input[type="text"], input[type="password"], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: var(--accent); }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
@@ -146,19 +146,22 @@
         </div>
 
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">El Asesor analizará AMBAS tarjetas al mismo tiempo y te dirá cuál te conviene usar para tu compra.</p>
-
-                <!-- Selector de Personalidad -->
+        
+        <!-- Selector de Personalidad -->
         <div style="margin-top: 15px; margin-bottom: 15px;">
-            <label style="color: #a855f7; display: inline-block; margin-right: 10px;">Actitud del Asesor:</label>
+            <label style="color: #a855f7; display: inline-block; margin-right: 10px; margin-top: 0;">Actitud del Asesor:</label>
             <select id="nivelAgresividad" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); outline: none; font-weight: bold;">
                 <option value="amable">😊 Amable y Paciente</option>
                 <option value="estricto" selected>🧐 Estricto (Contador)</option>
                 <option value="sargento">🤬 Sargento Despiadado</option>
             </select>
         </div>
-
         
-        <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?"></textarea>
+        <!-- Caja de texto con Micrófono integrado -->
+        <div style="position: relative; margin-top: 10px;">
+            <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?"></textarea>
+            <button id="btnVoz" onclick="iniciarDictado()" style="position: absolute; right: 10px; bottom: 15px; width: 45px; height: 45px; margin: 0; padding: 0; border-radius: 50%; background-color: #3b82f6; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-size: 20px;">🎙️</button>
+        </div>
         
         <button class="btn-ia" id="btnPreguntar" onclick="preguntarIA()">Consultar al Asesor</button>
         
@@ -168,8 +171,7 @@
 </div>
 
 <script>
-    // --- BASE DE DATOS LOCAL MULTI-TARJETA (Versión 2) ---
-    // Cambiamos el nombre de guardado a 'ia_finanzas_v2' para no chocar con tu versión anterior
+    // --- BASE DE DATOS LOCAL MULTI-TARJETA ---
     let tarjetaActual = 'Nu';
     let datosFinancieros = JSON.parse(localStorage.getItem('ia_finanzas_v2')) || {
         saldoDebito: '', apiKey: '',
@@ -180,7 +182,7 @@
     };
 
     function cambiarPestana(tarjeta) {
-        guardarDatos(); // Guardamos lo que haya escrito antes de cambiar
+        guardarDatos();
         tarjetaActual = tarjeta;
         
         let btnNu = document.getElementById('btnNu');
@@ -293,11 +295,11 @@
     }
 
     // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
-        async function preguntarIA() {
-        guardarDatos();
+    async function preguntarIA() {
+        guardarDatos(); 
         let pregunta = document.getElementById('preguntaIA').value.trim();
         let apiKey = document.getElementById('apiKey').value.trim();
-        let nivel = document.getElementById('nivelAgresividad').value; // <--- Lee el nivel
+        let nivel = document.getElementById('nivelAgresividad').value;
 
         if(!apiKey) { alert("⚠️ Primero debes pegar tu API Key en la configuración de arriba."); return; }
         if(!pregunta) { alert("Escribe qué es lo que quieres comprar o preguntar."); return; }
@@ -312,6 +314,7 @@
 
         let Nu = datosFinancieros.tarjetas.Nu;
         let MP = datosFinancieros.tarjetas.MP;
+        
         let cargaNu = Nu.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
         let cargaMP = MP.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
 
@@ -329,28 +332,30 @@
         let promptMaestro = `${personalidad}
 El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
 
-Considera estos datos financieros actuales:
+Considera estos datos financieros actuales del usuario:
 - Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
 
 TARJETA NU:
 - Límite: $${Nu.limiteTdc || 0} | Deuda actual: $${Nu.deudaTdc || 0}
-- Día de corte: ${Nu.diaCorte || 'No definido'} | Carga mensual MSI: $${cargaNu.toFixed(2)}
+- Día de corte: ${Nu.diaCorte || 'No definido'} | Carga mensual por MSI: $${cargaNu.toFixed(2)}
 
 TARJETA MERCADO PAGO:
 - Límite: $${MP.limiteTdc || 0} | Deuda actual: $${MP.deudaTdc || 0}
-- Día de corte: ${MP.diaCorte || 'No definido'} | Carga mensual MSI: $${cargaMP.toFixed(2)}
+- Día de corte: ${MP.diaCorte || 'No definido'} | Carga mensual por MSI: $${cargaMP.toFixed(2)}
 
-INSTRUCCIONES:
+INSTRUCCIONES PARA TU RESPUESTA:
 1. Haz un análisis matemático considerando qué tarjeta le conviene más por sus días de corte y límite disponible.
-2. Si es mala idea, usa tu personalidad (${nivel}) para decirle por qué.
-3. Si es buena idea, dile EXACTAMENTE con qué tarjeta pagar.
-4. Ve directo al grano y formatea tu respuesta de forma limpia.`;
+2. Si la compra es mala idea, usa tu personalidad (${nivel}) para decirle por qué.
+3. Si la compra es viable, dile EXACTAMENTE con qué tarjeta pagar.
+4. No uses saludos largos, ve directo al grano y formatea tu respuesta de forma limpia.`;
 
         try {
             let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: promptMaestro }] }] })
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptMaestro }] }]
+                })
             });
             
             let data = await response.json();
@@ -364,15 +369,54 @@ INSTRUCCIONES:
                 respDiv.innerHTML = respuestaIA;
             }
         } catch (error) {
-            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet.</span>`;
+            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet o intenta de nuevo.</span>`;
         }
         
         btn.innerText = "Consultar al Asesor";
         btn.disabled = false;
     }
 
+    // --- FUNCIÓN DE DICTADO POR VOZ ---
+    function iniciarDictado() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Tu navegador no soporta el dictado por voz. Intenta usar Google Chrome.");
+            return;
+        }
+        
+        let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = new SpeechRecognition();
+        
+        recognition.lang = 'es-MX';
+        recognition.interimResults = false;
+        
+        let btnVoz = document.getElementById('btnVoz');
+        let txtPregunta = document.getElementById('preguntaIA');
+        
+        recognition.onstart = function() {
+            btnVoz.innerText = "🔴";
+            btnVoz.style.backgroundColor = "#ef4444";
+            txtPregunta.placeholder = "Te escucho fuerte y claro...";
+        };
+        
+        recognition.onresult = function(event) {
+            let textoDictado = event.results[0][0].transcript;
+            txtPregunta.value += (txtPregunta.value ? " " : "") + textoDictado;
+        };
+        
+        recognition.onerror = function(event) {
+            alert("Hubo un error al usar el micrófono. Asegúrate de darle permisos a la página.");
+        };
+        
+        recognition.onend = function() {
+            btnVoz.innerText = "🎙️";
+            btnVoz.style.backgroundColor = "#3b82f6";
+            txtPregunta.placeholder = "Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?";
+        };
+        
+        recognition.start();
+    }
+
     cargarUI();
 </script>
 </body>
 </html>
-
