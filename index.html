@@ -5,61 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asesor Financiero IA</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+                :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.45); /* Efecto cristal */
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #3b82f6; 
-            --danger: #ef4444; 
+            --accent: #8b5cf6; 
+            --accent-mp: #3b82f6;
+            --danger: #ff4d4d; 
             --success: #10b981; 
-            --input-bg: #0f172a;
-            --border: #334155;
+            --input-bg: rgba(15, 23, 42, 0.5);
+            --border: rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            /* Fondo con degradado elegante */
+            background: linear-gradient(135deg, #0b0f19 0%, #17112c 50%, #091325 100%); 
+            background-attachment: fixed;
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 15px; 
+            min-height: 100vh;
+        }
+
+        /* Luces de neón difuminadas en el fondo para resaltar el cristal */
+        body::before {
+            content: ''; position: fixed; top: -10%; left: -10%; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+        }
+        body::after {
+            content: ''; position: fixed; bottom: -10%; right: -10%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+        }
+
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
         
-        h1 { text-align: center; color: var(--accent); font-size: 24px; margin-bottom: 25px; }
-        h2 { font-size: 18px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 5px; }
+        /* Título con degradado */
+        h1 { text-align: center; background: linear-gradient(90deg, #a855f7, #3b82f6); -webkit-background-clip: text; color: transparent; font-size: 26px; margin-bottom: 25px; font-weight: 800; }
+        h2 { font-size: 18px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-weight: 600; }
         
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        /* MAGIA DEL GLASSMORPHISM EN LAS TARJETAS */
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 22px; 
+            border-radius: 16px; 
+            margin-bottom: 25px; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--glass-shadow); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4); }
         
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="number"], input[type="text"], input[type="password"], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        input:focus, select:focus { border-color: var(--accent); }
+        label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Entradas de texto premium */
+        input[type="number"], input[type="text"], input[type="password"], select, textarea { 
+            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--border); 
+            background: var(--input-bg); color: var(--text-main); font-size: 15px; box-sizing: border-box; outline: none; transition: all 0.3s ease; 
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(139, 92, 246, 0.2); background: rgba(15, 23, 42, 0.8); }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
-        button { width: 100%; padding: 14px; margin-top: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: opacity 0.2s; }
-        button:hover { opacity: 0.9; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary { background-color: var(--accent); color: white; }
+        /* Botones flotantes y luminosos */
+        button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 10px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px; }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .msi-list { margin-top: 15px; }
-        .msi-item { background: var(--input-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .msi-info h4 { margin: 0; font-size: 15px; color: var(--text-main); }
-        .msi-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { background: linear-gradient(135deg, #60a5fa, #3b82f6); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        
+        .btn-ia { background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
+        .btn-ia:hover { background: linear-gradient(135deg, #c084fc, #9333ea); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); }
+        
+        /* Lista de MSI */
+        .msi-list { margin-top: 20px; }
+        .msi-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); transition: all 0.2s ease; }
+        .msi-item:hover { background: rgba(255, 255, 255, 0.06); }
+        .msi-info h4 { margin: 0; font-size: 15px; color: var(--text-main); font-weight: 600; }
+        .msi-info p { margin: 6px 0 0 0; font-size: 12px; color: var(--text-muted); }
         .msi-amount { font-weight: bold; color: var(--danger); font-size: 16px; text-align: right; }
         
-        .summary-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; }
-        .summary-box span { display: block; font-size: 13px; color: var(--danger); font-weight: bold; }
-        .summary-box .big-number { font-size: 24px; margin-top: 5px; }
+        /* Caja de resumen matemático */
+        .summary-box { background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2); padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .summary-box span { display: block; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .summary-box .big-number { font-size: 28px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-        .ia-section { border-left: 4px solid #a855f7; }
-        textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 15px; box-sizing: border-box; resize: vertical; min-height: 100px; margin-top: 10px; outline: none; }
-        textarea:focus { border-color: #a855f7; }
-        .btn-ia { background-color: #a855f7; color: white; margin-top: 10px;}
+        .ia-section { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%); }
         
-        #respuestaIA { margin-top: 15px; padding: 15px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; display: none; white-space: pre-wrap; font-size: 15px; line-height: 1.5; color: #e2e8f0; }
+        #respuestaIA { margin-top: 20px; padding: 18px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; display: none; white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #e2e8f0; border-left: 4px solid #a855f7; }
         
-        .api-config { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #a855f7; }
+        .api-config { background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed rgba(168, 85, 247, 0.4); }
 
-        /* --- ESTILOS DEL SELECTOR DE TARJETAS --- */
-        .selector-tarjetas { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-tarjeta { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background-color: #1a1a2e; color: #a0a0b0; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
-        .btn-tarjeta.activa.nu { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
-        .btn-tarjeta.activa.mp { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        /* NUEVO SELECTOR DE TARJETAS TIPO PÍLDORA */
+        .selector-tarjetas { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+        .btn-tarjeta { flex: 1; padding: 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin-top: 0; }
+        .btn-tarjeta:hover { color: white; }
+        .btn-tarjeta.activa.nu { background: #8b5cf6; color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
+        .btn-tarjeta.activa.mp { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
     </style>
 </head>
 <body>
