@@ -146,6 +146,17 @@
         </div>
 
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">El Asesor analizará AMBAS tarjetas al mismo tiempo y te dirá cuál te conviene usar para tu compra.</p>
+
+                <!-- Selector de Personalidad -->
+        <div style="margin-top: 15px; margin-bottom: 15px;">
+            <label style="color: #a855f7; display: inline-block; margin-right: 10px;">Actitud del Asesor:</label>
+            <select id="nivelAgresividad" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); outline: none; font-weight: bold;">
+                <option value="amable">😊 Amable y Paciente</option>
+                <option value="estricto" selected>🧐 Estricto (Contador)</option>
+                <option value="sargento">🤬 Sargento Despiadado</option>
+            </select>
+        </div>
+
         
         <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?"></textarea>
         
@@ -282,10 +293,11 @@
     }
 
     // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
-    async function preguntarIA() {
-        guardarDatos(); // Asegurar que todo esté guardado antes de preguntar
+        async function preguntarIA() {
+        guardarDatos();
         let pregunta = document.getElementById('preguntaIA').value.trim();
         let apiKey = document.getElementById('apiKey').value.trim();
+        let nivel = document.getElementById('nivelAgresividad').value; // <--- Lee el nivel
 
         if(!apiKey) { alert("⚠️ Primero debes pegar tu API Key en la configuración de arriba."); return; }
         if(!pregunta) { alert("Escribe qué es lo que quieres comprar o preguntar."); return; }
@@ -293,52 +305,52 @@
         let btn = document.getElementById('btnPreguntar');
         let respDiv = document.getElementById('respuestaIA');
         
-        btn.innerText = "Calculando estrategia...";
+        btn.innerText = "Calculando respuesta...";
         btn.disabled = true;
         respDiv.style.display = 'block';
-        respDiv.innerHTML = "<i>Analizando ambas tarjetas...</i>";
+        respDiv.innerHTML = "<i>Analizando tus números...</i>";
 
-        // Obtener datos de ambas tarjetas
         let Nu = datosFinancieros.tarjetas.Nu;
         let MP = datosFinancieros.tarjetas.MP;
-        
         let cargaNu = Nu.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
         let cargaMP = MP.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
 
-        // 🧠 EL NUEVO PROMPT MAESTRO ESTRATEGA
-        let promptMaestro = `Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México.
+        // 🎭 DEFINIR LA PERSONALIDAD MÚLTIPLE
+        let personalidad = "";
+        if (nivel === "amable") {
+            personalidad = "Eres un asesor financiero muy amable, empático, motivador y paciente. Hablas en español de México. Tu objetivo es educar y guiar suavemente sin regañar. Si la compra es mala idea, aconséjale con cariño y dale ánimos para organizar sus finanzas.";
+        } else if (nivel === "estricto") {
+            personalidad = "Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México. Eres directo y usas sus propios números para evidenciar sus errores.";
+        } else if (nivel === "sargento") {
+            personalidad = "Eres un sargento militar financiero, brutalmente honesto, sarcástico, despiadado y usas un tono muy agresivo (sin groserías extremas). Hablas en español de México. Haces sentir al usuario que sus malas decisiones financieras son un desastre total y te burlas de sus caprichos destructivos.";
+        }
+
+        // 🧠 EL PROMPT CON LA PERSONALIDAD INYECTADA
+        let promptMaestro = `${personalidad}
 El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
 
-Considera estos datos financieros actuales del usuario antes de responder:
+Considera estos datos financieros actuales:
 - Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
 
 TARJETA NU:
-- Límite: $${Nu.limiteTdc || 0}
-- Deuda actual: $${Nu.deudaTdc || 0}
-- Día de corte: ${Nu.diaCorte || 'No definido'}
-- Día límite de pago: ${Nu.diaPago || 'No definido'}
-- Carga mensual actual por MSI: $${cargaNu.toFixed(2)}
+- Límite: $${Nu.limiteTdc || 0} | Deuda actual: $${Nu.deudaTdc || 0}
+- Día de corte: ${Nu.diaCorte || 'No definido'} | Carga mensual MSI: $${cargaNu.toFixed(2)}
 
 TARJETA MERCADO PAGO:
-- Límite: $${MP.limiteTdc || 0}
-- Deuda actual: $${MP.deudaTdc || 0}
-- Día de corte: ${MP.diaCorte || 'No definido'}
-- Día límite de pago: ${MP.diaPago || 'No definido'}
-- Carga mensual actual por MSI: $${cargaMP.toFixed(2)}
+- Límite: $${MP.limiteTdc || 0} | Deuda actual: $${MP.deudaTdc || 0}
+- Día de corte: ${MP.diaCorte || 'No definido'} | Carga mensual MSI: $${cargaMP.toFixed(2)}
 
-INSTRUCCIONES PARA TU RESPUESTA:
-1. Haz un análisis matemático rápido considerando qué tarjeta le conviene más usar basándote en sus días de corte (para darle más días de financiamiento) y su límite disponible.
-2. Si la compra es mala idea, regáñalo directo usando los números de su peor tarjeta.
-3. Si la compra es viable, dile EXACTAMENTE con cuál de las dos tarjetas (Nu o Mercado Pago) le conviene hacerla y por qué.
-4. No uses saludos largos, ve directo al grano. Formatea tu respuesta de forma limpia (usa listas y negritas).`;
+INSTRUCCIONES:
+1. Haz un análisis matemático considerando qué tarjeta le conviene más por sus días de corte y límite disponible.
+2. Si es mala idea, usa tu personalidad (${nivel}) para decirle por qué.
+3. Si es buena idea, dile EXACTAMENTE con qué tarjeta pagar.
+4. Ve directo al grano y formatea tu respuesta de forma limpia.`;
 
         try {
             let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptMaestro }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptMaestro }] }] })
             });
             
             let data = await response.json();
@@ -352,7 +364,7 @@ INSTRUCCIONES PARA TU RESPUESTA:
                 respDiv.innerHTML = respuestaIA;
             }
         } catch (error) {
-            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet o intenta de nuevo.</span>`;
+            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet.</span>`;
         }
         
         btn.innerText = "Consultar al Asesor";
