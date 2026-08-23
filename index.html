@@ -53,176 +53,138 @@
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes pulseGlow {
             0% { box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4); }
             100% { box-shadow: 0 12px 35px rgba(168, 85, 247, 0.8); }
         }
+        @keyframes slideDownToast {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOutToast {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
 
-        /* Clases para animación en cascada (Fade In) */
         .anim-fade-1 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.1s; }
         .anim-fade-2 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.3s; }
         .anim-fade-3 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.5s; }
 
+        /* --- NOTIFICACIONES TOAST (ALERTAS PREMIUM) --- */
+        .toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(25, 25, 30, 0.95); backdrop-filter: blur(12px);
+            border-left: 4px solid var(--danger); border-radius: 12px;
+            color: white; padding: 15px 20px; font-weight: 500; font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+            animation: slideDownToast 0.4s ease forwards;
+        }
+        .toast.success { border-left-color: var(--success); }
+        .toast.warning { border-left-color: #f59e0b; }
+
         /* --- BALANCE PRINCIPAL --- */
-        .balance-header {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-        .balance-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        .balance-header { text-align: center; margin-top: 20px; margin-bottom: 30px; }
+        .balance-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         .balance-amount {
-            font-size: 46px;
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            margin: 5px 0 15px 0;
+            font-size: 46px; font-weight: 800; letter-spacing: -1.5px; margin: 5px 0 15px 0;
             background: linear-gradient(to bottom right, #ffffff 0%, #a3a3a3 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .balance-input-wrapper {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(25, 25, 30, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 5px 15px;
-            transition: all 0.3s ease;
+            display: inline-flex; align-items: center; background: rgba(25, 25, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 5px 15px; transition: all 0.3s ease;
         }
         .balance-input-wrapper input {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            width: 120px;
-            padding: 5px;
-            outline: none;
-            transition: all 0.3s ease;
+            background: transparent; border: none; color: var(--text-main); font-size: 18px;
+            font-weight: 600; text-align: center; width: 120px; padding: 5px; outline: none; transition: all 0.3s ease;
         }
 
         /* --- SECCIONES GENERALES --- */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            margin-top: 30px;
-        }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; margin-top: 30px; }
 
         /* --- SELECTOR DE TARJETAS --- */
         .segment-control {
-            display: flex;
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            display: flex; background: var(--surface); border-radius: 12px; padding: 4px;
+            margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease;
         }
         .segment-btn {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 14px;
+            font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.3s ease;
         }
-        /* Efecto de presión en botones de segmento */
         .segment-btn:active { transform: scale(0.96); }
         .segment-btn.active.nu { background: var(--nu-color); color: white; }
         .segment-btn.active.mp { background: var(--mp-color); color: white; }
 
         /* --- LA TARJETA DE CRÉDITO VISUAL --- */
         .credit-card-visual {
-            background: linear-gradient(135deg, #b026ff 0%, #5d00ff 100%);
-            border-radius: 20px;
-            padding: 25px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
-            transition: all 0.4s ease; /* Transición un poco más larga para colores */
+            background: linear-gradient(135deg, #b026ff 0%, #5d00ff 100%); border-radius: 20px;
+            padding: 25px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4); transition: all 0.4s ease;
         }
         .credit-card-visual.mp-style {
-            background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
-            box-shadow: 0 10px 30px rgba(0, 158, 227, 0.4);
+            background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%); box-shadow: 0 10px 30px rgba(0, 158, 227, 0.4);
         }
-        
         .card-chip {
-            width: 42px; height: 30px;
-            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-            border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+            width: 42px; height: 30px; background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+            border-radius: 6px; margin-bottom: 20px; box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
         }
-        
-        .card-inputs-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .card-input-group label {
-            display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        
-        /* Inputs hundidos */
+        .card-inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card-input-group label { display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .card-input-group input {
-            width: 100%; 
-            background: rgba(0, 0, 0, 0.25); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            color: #ffffff;
-            border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
-            box-sizing: border-box; outline: none; 
-            transition: all 0.3s ease;
+            width: 100%; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.1); 
+            color: #ffffff; border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
+            box-sizing: border-box; outline: none; transition: all 0.3s ease;
         }
         .card-input-group input:focus { border-color: rgba(255,255,255,0.5); }
 
         /* --- EFECTO GLASSMORPHISM --- */
         .glass-panel {
-            background-color: rgba(25, 25, 30, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            background-color: rgba(25, 25, 30, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 20px; transition: all 0.3s ease;
         }
 
-        /* --- INPUTS GLOBALES --- */
-        .input-group { margin-bottom: 15px; }
+        /* --- INPUTS GLOBALES Y DROPDOWN CUSTOM --- */
+        .input-group { margin-bottom: 15px; position: relative; }
         .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
         .fintech-input {
-            width: 100%; 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            color: white;
-            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; 
-            transition: all 0.3s ease;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); color: white;
+            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; transition: all 0.3s ease;
         }
         .fintech-input:focus { border-color: rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); }
+
+        /* MENÚ DESPLEGABLE PERSONALIZADO */
+        .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; }
+        .custom-select-display {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .custom-select-options {
+            position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px;
+            background: rgba(25, 25, 30, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px);
+            transition: all 0.3s ease; z-index: 100;
+        }
+        .custom-select-options.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-option {
+            padding: 16px; font-size: 15px; color: var(--text-muted); transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover, .custom-option.selected { background: rgba(168, 85, 247, 0.2); color: white; font-weight: 600; }
         
         /* --- BOTONES PREMIUM --- */
         .btn-premium {
-            width: 100%; background: white; color: black; border: none;
-            border-radius: 30px; padding: 16px; font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
+            width: 100%; background: white; color: black; border: none; border-radius: 30px;
+            padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
-        /* Efecto de presión en botones principales */
         .btn-premium:active { transform: scale(0.96); }
-        
-        /* Botón de IA con animación Pulse Glow */
         .btn-ia-action { 
-            background: linear-gradient(135deg, #b026ff, #5d00ff); 
-            color: white; 
+            background: linear-gradient(135deg, #b026ff, #5d00ff); color: white; 
             animation: pulseGlow 2s infinite alternate;
         }
 
@@ -230,8 +192,7 @@
         .transaction-list { margin-top: 20px; }
         .transaction-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
+            padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;
         }
         .t-info h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
         .t-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
@@ -239,24 +200,19 @@
         .t-amount-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
         .t-amount-btn { background: none; border: none; color: var(--danger); font-size: 12px; padding: 4px 0 0 0; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
 
-        .carga-mensual-box {
-            display: flex; justify-content: space-between; align-items: center; margin-top: 15px;
-        }
+        .carga-mensual-box { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .carga-label { font-size: 13px; color: var(--text-muted); }
         .carga-val { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #b026ff, #5d00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .mp-style-text { background: linear-gradient(135deg, #00C6FF, #0072FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* --- SECCIÓN IA --- */
-        .ia-container {
-            margin-top: 40px; 
-        }
+        .ia-container { margin-top: 40px; }
         .ia-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .ia-header h2 { margin: 0; font-size: 18px; color: white; }
         
         .chat-bubble {
             background: rgba(168, 85, 247, 0.1); border-radius: 16px; border-bottom-left-radius: 4px;
-            padding: 15px; margin-top: 20px; font-size: 15px; line-height: 1.5; display: none; border: 1px solid rgba(168, 85, 247, 0.3);
-            transition: all 0.3s ease;
+            padding: 15px; margin-top: 20px; font-size: 15px; line-height: 1.5; display: none; border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s ease;
         }
 
         /* Micrófono flotante */
@@ -272,6 +228,9 @@
     </style>
 </head>
 <body>
+
+<!-- Contenedor para notificaciones Toast -->
+<div id="toastContainer" class="toast-container"></div>
 
 <div class="app-container">
     
@@ -315,7 +274,7 @@
         </div>
     </div>
 
-    <!-- COMPRAS A MESES (NUEVO PANEL GLASSMORPHISM) -->
+    <!-- COMPRAS A MESES (GLASSMORPHISM) -->
     <h3 class="section-title anim-fade-2">Meses sin Intereses</h3>
     
     <div class="glass-panel anim-fade-2">
@@ -340,8 +299,7 @@
         </div>
     </div>
 
-
-    <!-- SECCIÓN IA (NUEVO PANEL GLASSMORPHISM) -->
+    <!-- SECCIÓN IA (GLASSMORPHISM) -->
     <div class="glass-panel ia-container anim-fade-3">
         <div class="ia-header">
             <span style="font-size: 24px;">🧠</span>
@@ -355,11 +313,20 @@
 
         <div class="input-group">
             <label>Personalidad del Asesor</label>
-            <select id="nivelAgresividad" class="fintech-input">
-                <option value="amable">Amable y Empático</option>
-                <option value="estricto" selected>Contador Estricto</option>
-                <option value="sargento">Sargento Despiadado</option>
-            </select>
+            <!-- Dropdown Customizado para reemplazar al gris nativo -->
+            <div class="custom-select-wrapper" onclick="toggleDropdown(event)">
+                <div class="fintech-input custom-select-display" id="displayPersonalidad">
+                    <span>🧐 Contador Estricto</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">▼</span>
+                </div>
+                <div class="custom-select-options" id="dropdownOptions">
+                    <div class="custom-option" onclick="seleccionarPersonalidad('amable', '😊 Amable y Empático', event)">😊 Amable y Empático</div>
+                    <div class="custom-option selected" onclick="seleccionarPersonalidad('estricto', '🧐 Contador Estricto', event)">🧐 Contador Estricto</div>
+                    <div class="custom-option" onclick="seleccionarPersonalidad('sargento', '🤬 Sargento Despiadado', event)">🤬 Sargento Despiadado</div>
+                </div>
+                <!-- Input oculto para guardar el valor -->
+                <input type="hidden" id="nivelAgresividad" value="estricto">
+            </div>
         </div>
 
         <div class="mic-container">
@@ -383,6 +350,51 @@
             MP: { limiteTdc: '', deudaTdc: '', diaCorte: '', diaPago: '', msi: [] }
         }
     };
+
+    // --- FUNCIÓN DE ALERTA TOAST PREMIUM ---
+    function mostrarAlerta(mensaje, tipo = 'error') {
+        let container = document.getElementById('toastContainer');
+        let toast = document.createElement('div');
+        toast.className = `toast ${tipo}`;
+        let icono = tipo === 'error' ? '⚠️' : (tipo === 'success' ? '✅' : '🔔');
+        
+        toast.innerHTML = `<span style="font-size: 20px;">${icono}</span> <div>${mensaje}</div>`;
+        container.appendChild(toast);
+        
+        // Quitar la alerta después de 3.5 segundos
+        setTimeout(() => {
+            toast.style.animation = 'fadeOutToast 0.4s ease forwards';
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
+    }
+
+    // --- LÓGICA DEL DROPDOWN CUSTOM ---
+    function toggleDropdown(e) {
+        document.getElementById('dropdownOptions').classList.toggle('show');
+    }
+    
+    function seleccionarPersonalidad(valor, texto, evento) {
+        evento.stopPropagation(); // Evitar que se vuelva a abrir el menú al hacer click
+        document.getElementById('nivelAgresividad').value = valor;
+        document.getElementById('displayPersonalidad').innerHTML = `<span>${texto}</span> <span style="font-size: 10px; color: var(--text-muted);">▼</span>`;
+        
+        // Actualizar visualmente la opción seleccionada
+        let opciones = document.querySelectorAll('.custom-option');
+        opciones.forEach(opt => opt.classList.remove('selected'));
+        evento.currentTarget.classList.add('selected');
+        
+        document.getElementById('dropdownOptions').classList.remove('show');
+    }
+
+    // Cerrar dropdown si haces click afuera
+    window.onclick = function(event) {
+        if (!event.target.closest('.custom-select-wrapper')) {
+            let dropdown = document.getElementById('dropdownOptions');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    }
 
     function actualizarSaldoVisual() {
         let saldo = document.getElementById('saldoDebito').value;
@@ -451,7 +463,8 @@
         let plazo = parseInt(document.getElementById('msiPlazo').value);
 
         if(concepto === '' || isNaN(total) || isNaN(plazo) || total <= 0 || plazo <= 0) {
-            alert("Completa bien los datos de la compra."); return;
+            mostrarAlerta("Por favor completa todos los datos de la compra correctamente.", "error"); 
+            return;
         }
 
         let pagoMensual = total / plazo;
@@ -460,12 +473,14 @@
         
         document.getElementById('msiConcepto').value = ''; document.getElementById('msiTotal').value = ''; document.getElementById('msiPlazo').value = '';
         renderMSI();
+        mostrarAlerta("Compra a meses registrada con éxito.", "success");
     }
 
     function borrarMSI(index) {
         if(confirm("¿Eliminar esta compra?")) {
             datosFinancieros.tarjetas[tarjetaActual].msi.splice(index, 1);
             guardarDatos(); renderMSI();
+            mostrarAlerta("Compra eliminada.", "warning");
         }
     }
 
@@ -503,8 +518,8 @@
         let apiKey = document.getElementById('apiKey').value.trim();
         let nivel = document.getElementById('nivelAgresividad').value;
 
-        if(!apiKey) { alert("Pega tu API Key en la configuración."); return; }
-        if(!pregunta) { alert("Escribe tu pregunta."); return; }
+        if(!apiKey) { mostrarAlerta("Primero pega tu API Key en la configuración."); return; }
+        if(!pregunta) { mostrarAlerta("Escribe o dicta tu pregunta para el asesor."); return; }
 
         let btn = document.getElementById('btnPreguntar');
         let respDiv = document.getElementById('respuestaIA');
@@ -569,7 +584,7 @@ INSTRUCCIONES:
 
     function iniciarDictado() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("No soportado. Usa Chrome."); return;
+            mostrarAlerta("El dictado por voz no es compatible con este navegador. Usa Chrome.", "error"); return;
         }
         let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = new SpeechRecognition();
