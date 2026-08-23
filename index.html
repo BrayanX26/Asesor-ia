@@ -14,8 +14,8 @@
             --surface-2: #222222; /* Para inputs */
             --text-main: #FFFFFF;
             --text-muted: #8E8E93; /* Gris estilo Apple */
-            --nu-color: #820ad1; /* Morado Nu oficial */
-            --mp-color: #009EE3; /* Azul MP oficial */
+            --nu-color: #820ad1; 
+            --mp-color: #009EE3; 
             --danger: #FF453A; 
             --success: #32D74B;
         }
@@ -28,6 +28,18 @@
             padding: 0;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Luces de neón de fondo para que el glassmorphism resalte */
+        body::before {
+            content: ''; position: fixed; top: -10%; left: -20%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 60%);
+            z-index: -1; pointer-events: none;
+        }
+        body::after {
+            content: ''; position: fixed; bottom: -10%; right: -20%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 60%);
+            z-index: -1; pointer-events: none;
         }
 
         .app-container {
@@ -49,16 +61,23 @@
             letter-spacing: 1px;
             font-weight: 600;
         }
+        
+        /* Efecto Metálico / Plateado */
         .balance-amount {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 800;
             letter-spacing: -1.5px;
             margin: 5px 0 15px 0;
+            background: linear-gradient(to bottom right, #ffffff 0%, #a3a3a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        
         .balance-input-wrapper {
             display: inline-flex;
             align-items: center;
-            background: var(--surface);
+            background: rgba(25, 25, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             padding: 5px 15px;
         }
@@ -71,6 +90,7 @@
             text-align: center;
             width: 120px;
             padding: 5px;
+            outline: none;
         }
 
         /* --- SECCIONES GENERALES --- */
@@ -81,13 +101,14 @@
             margin-top: 30px;
         }
 
-        /* --- SELECTOR DE TARJETAS ESTILO iOS --- */
+        /* --- SELECTOR DE TARJETAS --- */
         .segment-control {
             display: flex;
             background: var(--surface);
             border-radius: 12px;
             padding: 4px;
             margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .segment-btn {
             flex: 1;
@@ -105,25 +126,27 @@
 
         /* --- LA TARJETA DE CRÉDITO VISUAL --- */
         .credit-card-visual {
-            background: linear-gradient(135deg, var(--nu-color), #5a0791);
+            /* Degradado elegante de Nu */
+            background: linear-gradient(135deg, #b026ff 0%, #5d00ff 100%);
             border-radius: 20px;
             padding: 25px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(130, 10, 209, 0.2);
+            /* Resplandor (Glow) morado */
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
             transition: all 0.4s ease;
         }
         .credit-card-visual.mp-style {
-            background: linear-gradient(135deg, var(--mp-color), #006eb0);
-            box-shadow: 0 15px 35px rgba(0, 158, 227, 0.2);
+            background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+            box-shadow: 0 10px 30px rgba(0, 158, 227, 0.4);
         }
-        /* El chip de la tarjeta */
+        
         .card-chip {
-            width: 40px; height: 28px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 4px;
+            width: 42px; height: 30px;
+            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+            border-radius: 6px;
             margin-bottom: 20px;
-            opacity: 0.9;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
         }
         
         .card-inputs-grid {
@@ -134,36 +157,60 @@
         .card-input-group label {
             display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
         }
+        
+        /* Inputs "hundidos" dentro de la tarjeta */
         .card-input-group input {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
-            color: white; border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
+            width: 100%; 
+            background: rgba(0, 0, 0, 0.25); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: #ffffff;
+            border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
             box-sizing: border-box; outline: none; transition: border 0.3s;
         }
-        .card-input-group input:focus { border-color: white; }
+        .card-input-group input:focus { border-color: rgba(255,255,255,0.5); }
 
-        /* --- INPUTS GLOBALES ESTILO FINTECH --- */
+        /* --- EFECTO GLASSMORPHISM PARA PANELES INFERIORES --- */
+        .glass-panel {
+            background-color: rgba(25, 25, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        /* --- INPUTS GLOBALES --- */
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
         .fintech-input {
-            width: 100%; background: var(--surface); border: none; color: white;
-            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; transition: background 0.3s;
+            width: 100%; 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            color: white;
+            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; transition: all 0.3s;
         }
-        .fintech-input:focus { background: var(--surface-2); }
+        .fintech-input:focus { border-color: rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); }
         
         /* --- BOTONES PREMIUM --- */
         .btn-premium {
             width: 100%; background: white; color: black; border: none;
             border-radius: 30px; padding: 16px; font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: transform 0.2s; margin-top: 10px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
         }
         .btn-premium:active { transform: scale(0.97); }
-        .btn-ia-action { background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; }
+        
+        /* Botón de IA con glow */
+        .btn-ia-action { 
+            background: linear-gradient(135deg, #b026ff, #5d00ff); 
+            color: white; 
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
 
         /* --- LISTA DE TRANSACCIONES (MSI) --- */
         .transaction-list { margin-top: 20px; }
         .transaction-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 0; border-bottom: 1px solid var(--surface-2);
+            padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .t-info h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
         .t-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
@@ -172,32 +219,34 @@
         .t-amount-btn { background: none; border: none; color: var(--danger); font-size: 12px; padding: 4px 0 0 0; cursor: pointer; font-weight: 600; }
 
         .carga-mensual-box {
-            background: var(--surface); border-radius: 16px; padding: 20px;
             display: flex; justify-content: space-between; align-items: center; margin-top: 15px;
         }
         .carga-label { font-size: 13px; color: var(--text-muted); }
-        .carga-val { font-size: 22px; font-weight: 800; color: var(--nu-color); }
+        .carga-val { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #b026ff, #5d00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mp-style-text { background: linear-gradient(135deg, #00C6FF, #0072FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* --- SECCIÓN IA --- */
         .ia-container {
-            background: var(--surface); border-radius: 24px; padding: 20px; margin-top: 40px; border: 1px solid rgba(168, 85, 247, 0.2);
+            margin-top: 40px; 
+            /* Se aplica el glass panel automático por la clase HTML */
         }
-        .ia-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .ia-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .ia-header h2 { margin: 0; font-size: 18px; color: white; }
         
         .chat-bubble {
-            background: rgba(168, 85, 247, 0.15); border-radius: 16px; border-bottom-left-radius: 4px;
+            background: rgba(168, 85, 247, 0.1); border-radius: 16px; border-bottom-left-radius: 4px;
             padding: 15px; margin-top: 20px; font-size: 15px; line-height: 1.5; display: none; border: 1px solid rgba(168, 85, 247, 0.3);
         }
 
         /* Micrófono flotante */
         .mic-container { position: relative; }
         .mic-btn {
-            position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px;
-            background: #a855f7; border: none; border-radius: 50%; color: white;
+            position: absolute; right: 10px; bottom: 10px; width: 42px; height: 42px;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white;
             font-size: 18px; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4);
+            cursor: pointer; backdrop-filter: blur(5px); transition: background 0.3s;
         }
+        .mic-btn:hover { background: rgba(168, 85, 247, 0.4); }
     </style>
 </head>
 <body>
@@ -244,11 +293,10 @@
         </div>
     </div>
 
-    <!-- COMPRAS A MESES -->
+    <!-- COMPRAS A MESES (NUEVO PANEL GLASSMORPHISM) -->
     <h3 class="section-title">Meses sin Intereses</h3>
     
-    <!-- Formulario de nueva compra -->
-    <div style="background: var(--surface); padding: 20px; border-radius: 16px;">
+    <div class="glass-panel">
         <div class="input-group">
             <input type="text" id="msiConcepto" class="fintech-input" placeholder="¿Qué compraste? (Ej. Audífonos)">
         </div>
@@ -257,20 +305,22 @@
             <input type="number" id="msiPlazo" class="fintech-input" placeholder="Meses (Ej. 6)">
         </div>
         <button class="btn-premium" onclick="agregarMSI()">Agregar Compra</button>
+        
+        <!-- Lista de transacciones -->
+        <div class="transaction-list" id="listaMSI"></div>
     </div>
-
-    <!-- Lista de transacciones -->
-    <div class="transaction-list" id="listaMSI"></div>
 
     <!-- Carga Mensual Total -->
-    <div class="carga-mensual-box" id="msiResumen" style="display: none;">
-        <div class="carga-label">Carga Mensual<br>en esta tarjeta</div>
-        <div class="carga-val" id="msiTotalMensual">$0.00</div>
+    <div class="glass-panel" id="msiResumen" style="display: none; margin-top: 15px;">
+        <div class="carga-mensual-box" style="margin-top: 0;">
+            <div class="carga-label">Carga Mensual<br>en esta tarjeta</div>
+            <div class="carga-val" id="msiTotalMensual">$0.00</div>
+        </div>
     </div>
 
 
-    <!-- SECCIÓN IA -->
-    <div class="ia-container">
+    <!-- SECCIÓN IA (NUEVO PANEL GLASSMORPHISM) -->
+    <div class="glass-panel ia-container">
         <div class="ia-header">
             <span style="font-size: 24px;">🧠</span>
             <h2>Asesor Financiero</h2>
@@ -324,6 +374,7 @@
         let btnNu = document.getElementById('btnNu');
         let btnMP = document.getElementById('btnMP');
         let visualCard = document.getElementById('visualCard');
+        let msiTotalText = document.getElementById('msiTotalMensual');
 
         btnNu.classList.remove('active', 'nu');
         btnMP.classList.remove('active', 'mp');
@@ -331,9 +382,11 @@
         if(tarjeta === 'Nu') {
             btnNu.classList.add('active', 'nu');
             visualCard.classList.remove('mp-style');
+            msiTotalText.classList.remove('mp-style-text');
         } else {
             btnMP.classList.add('active', 'mp');
             visualCard.classList.add('mp-style');
+            msiTotalText.classList.add('mp-style-text');
         }
 
         cargarDatosEnInputs();
@@ -404,8 +457,6 @@
 
         if(msiActual.length === 0) { resumen.style.display = 'none'; return; }
 
-        let colorAcento = tarjetaActual === 'Nu' ? 'var(--nu-color)' : 'var(--mp-color)';
-
         msiActual.forEach((item, index) => {
             sumaMensual += item.pagoMensual;
             contenedor.innerHTML += `
@@ -420,9 +471,8 @@
                     </div>
                 </div>`;
         });
-        resumen.style.display = 'flex'; 
+        resumen.style.display = 'block'; 
         totalMensual.innerText = `$${sumaMensual.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
-        totalMensual.style.color = colorAcento;
     }
 
     async function preguntarIA() {
@@ -508,7 +558,7 @@ INSTRUCCIONES:
         
         recognition.onstart = function() { btnVoz.innerText = "🔴"; btnVoz.style.background = "#FF453A"; };
         recognition.onresult = function(event) { txtPregunta.value += (txtPregunta.value ? " " : "") + event.results[0][0].transcript; };
-        recognition.onend = function() { btnVoz.innerText = "🎙️"; btnVoz.style.background = "#a855f7"; };
+        recognition.onend = function() { btnVoz.innerText = "🎙️"; btnVoz.style.background = "rgba(255,255,255,0.1)"; };
         recognition.start();
     }
 
