@@ -4,229 +4,305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asesor Financiero IA</title>
+    <!-- Fuente Premium de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(30, 41, 59, 0.45); /* Efecto cristal */
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #8b5cf6; 
-            --accent-mp: #3b82f6;
-            --danger: #ff4d4d; 
-            --success: #10b981; 
-            --input-bg: rgba(15, 23, 42, 0.5);
-            --border: rgba(255, 255, 255, 0.12);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --bg-base: #000000; /* Negro OLED puro */
+            --surface: #141414; /* Gris muy oscuro para tarjetas */
+            --surface-2: #222222; /* Para inputs */
+            --text-main: #FFFFFF;
+            --text-muted: #8E8E93; /* Gris estilo Apple */
+            --nu-color: #820ad1; /* Morado Nu oficial */
+            --mp-color: #009EE3; /* Azul MP oficial */
+            --danger: #FF453A; 
+            --success: #32D74B;
         }
 
-        /* Matamos el fondo blanco por defecto del navegador */
-        html {
-            background-color: #0b0f19;
-        }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background-color: #0b0f19; /* Fondo oscuro sólido para evitar glitches */
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 15px; 
+        html, body {
+            background-color: var(--bg-base);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 20px 80px 20px;
+        }
+
+        /* --- BALANCE PRINCIPAL --- */
+        .balance-header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .balance-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin: 5px 0 15px 0;
+        }
+        .balance-input-wrapper {
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 5px 15px;
+        }
+        .balance-input-wrapper input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            width: 120px;
+            padding: 5px;
+        }
+
+        /* --- SECCIONES GENERALES --- */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        /* --- SELECTOR DE TARJETAS ESTILO iOS --- */
+        .segment-control {
+            display: flex;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+        .segment-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .segment-btn.active.nu { background: var(--nu-color); color: white; }
+        .segment-btn.active.mp { background: var(--mp-color); color: white; }
+
+        /* --- LA TARJETA DE CRÉDITO VISUAL --- */
+        .credit-card-visual {
+            background: linear-gradient(135deg, var(--nu-color), #5a0791);
+            border-radius: 20px;
+            padding: 25px;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(130, 10, 209, 0.2);
+            transition: all 0.4s ease;
+        }
+        .credit-card-visual.mp-style {
+            background: linear-gradient(135deg, var(--mp-color), #006eb0);
+            box-shadow: 0 15px 35px rgba(0, 158, 227, 0.2);
+        }
+        /* El chip de la tarjeta */
+        .card-chip {
+            width: 40px; height: 28px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .card-inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .card-input-group label {
+            display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .card-input-group input {
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
+            box-sizing: border-box; outline: none; transition: border 0.3s;
+        }
+        .card-input-group input:focus { border-color: white; }
+
+        /* --- INPUTS GLOBALES ESTILO FINTECH --- */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        .fintech-input {
+            width: 100%; background: var(--surface); border: none; color: white;
+            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; transition: background 0.3s;
+        }
+        .fintech-input:focus { background: var(--surface-2); }
+        
+        /* --- BOTONES PREMIUM --- */
+        .btn-premium {
+            width: 100%; background: white; color: black; border: none;
+            border-radius: 30px; padding: 16px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: transform 0.2s; margin-top: 10px;
+        }
+        .btn-premium:active { transform: scale(0.97); }
+        .btn-ia-action { background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; }
+
+        /* --- LISTA DE TRANSACCIONES (MSI) --- */
+        .transaction-list { margin-top: 20px; }
+        .transaction-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 0; border-bottom: 1px solid var(--surface-2);
+        }
+        .t-info h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
+        .t-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
+        .t-amount { text-align: right; }
+        .t-amount-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .t-amount-btn { background: none; border: none; color: var(--danger); font-size: 12px; padding: 4px 0 0 0; cursor: pointer; font-weight: 600; }
+
+        .carga-mensual-box {
+            background: var(--surface); border-radius: 16px; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center; margin-top: 15px;
+        }
+        .carga-label { font-size: 13px; color: var(--text-muted); }
+        .carga-val { font-size: 22px; font-weight: 800; color: var(--nu-color); }
+
+        /* --- SECCIÓN IA --- */
+        .ia-container {
+            background: var(--surface); border-radius: 24px; padding: 20px; margin-top: 40px; border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .ia-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .ia-header h2 { margin: 0; font-size: 18px; color: white; }
+        
+        .chat-bubble {
+            background: rgba(168, 85, 247, 0.15); border-radius: 16px; border-bottom-left-radius: 4px;
+            padding: 15px; margin-top: 20px; font-size: 15px; line-height: 1.5; display: none; border: 1px solid rgba(168, 85, 247, 0.3);
         }
 
-        /* Luces de neón MÁS INTENSAS de fondo para que el cristal haga contraste */
-        body::before {
-            content: ''; position: fixed; top: 0%; left: -20%; width: 450px; height: 450px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, rgba(0,0,0,0) 65%);
-            z-index: -1;
+        /* Micrófono flotante */
+        .mic-container { position: relative; }
+        .mic-btn {
+            position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px;
+            background: #a855f7; border: none; border-radius: 50%; color: white;
+            font-size: 18px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4);
         }
-        body::after {
-            content: ''; position: fixed; bottom: 10%; right: -20%; width: 450px; height: 450px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(0,0,0,0) 65%);
-            z-index: -1;
-        }
-
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
-        
-        /* Título con degradado */
-        h1 { text-align: center; background: linear-gradient(90deg, #a855f7, #3b82f6); -webkit-background-clip: text; color: transparent; font-size: 26px; margin-bottom: 25px; font-weight: 800; }
-        h2 { font-size: 18px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-weight: 600; }
-        
-        /* MAGIA DEL GLASSMORPHISM EN LAS TARJETAS */
-        .card { 
-            background: var(--card-bg); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            padding: 22px; 
-            border-radius: 16px; 
-            margin-bottom: 25px; 
-            border: 1px solid var(--border); 
-            box-shadow: var(--glass-shadow); 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4); }
-        
-        label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* Entradas de texto premium */
-        input[type="number"], input[type="text"], input[type="password"], select, textarea { 
-            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--border); 
-            background: var(--input-bg); color: var(--text-main); font-size: 15px; box-sizing: border-box; outline: none; transition: all 0.3s ease; 
-            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(139, 92, 246, 0.2); background: rgba(15, 23, 42, 0.8); }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        
-        /* Botones flotantes y luminosos */
-        button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 10px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px; }
-        button:active { transform: scale(0.98); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-        .btn-primary:hover { background: linear-gradient(135deg, #60a5fa, #3b82f6); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-        
-        .btn-ia { background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
-        .btn-ia:hover { background: linear-gradient(135deg, #c084fc, #9333ea); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); }
-        
-        /* Lista de MSI */
-        .msi-list { margin-top: 20px; }
-        .msi-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); transition: all 0.2s ease; }
-        .msi-item:hover { background: rgba(255, 255, 255, 0.06); }
-        .msi-info h4 { margin: 0; font-size: 15px; color: var(--text-main); font-weight: 600; }
-        .msi-info p { margin: 6px 0 0 0; font-size: 12px; color: var(--text-muted); }
-        .msi-amount { font-weight: bold; color: var(--danger); font-size: 16px; text-align: right; }
-        
-        /* Caja de resumen matemático */
-        .summary-box { background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2); padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-        .summary-box span { display: block; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .summary-box .big-number { font-size: 28px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-
-        .ia-section { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%); }
-        
-        #respuestaIA { margin-top: 20px; padding: 18px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; display: none; white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #e2e8f0; border-left: 4px solid #a855f7; }
-        
-        .api-config { background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed rgba(168, 85, 247, 0.4); }
-
-        /* NUEVO SELECTOR DE TARJETAS TIPO PÍLDORA */
-        .selector-tarjetas { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
-        .btn-tarjeta { flex: 1; padding: 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin-top: 0; }
-        .btn-tarjeta:hover { color: white; }
-        .btn-tarjeta.activa.nu { background: #8b5cf6; color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
-        .btn-tarjeta.activa.mp { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🤖 Asesor Financiero IA</h1>
-
-    <!-- SECCIÓN 1: DÉBITO Y EFECTIVO -->
-    <div class="card">
-        <h2>💰 Dinero a Favor</h2>
-        <label>Saldo total disponible (Débito + Efectivo)</label>
-        <input type="number" id="saldoDebito" placeholder="Ej. 1500" onchange="guardarDatos()">
-    </div>
-
-    <!-- SECCIÓN 2: TARJETA DE CRÉDITO -->
-    <div class="card" id="cardTdc" style="border-left-color: #8b5cf6;">
-        
-        <!-- Selector de Tarjetas -->
-        <div class="selector-tarjetas">
-            <button id="btnNu" class="btn-tarjeta activa nu" onclick="cambiarPestana('Nu')">🟪 Tarjeta Nu</button>
-            <button id="btnMP" class="btn-tarjeta" onclick="cambiarPestana('MP')">🟦 Mercado Pago</button>
-        </div>
-        
-        <h3 id="tituloTarjetaVisual" style="margin-top: 0; color: #8b5cf6;">Datos de Nu</h3>
-
-        <div class="grid-2">
-            <div>
-                <label>Límite Total ($)</label>
-                <input type="number" id="limiteTdc" placeholder="Ej. 5000" onchange="guardarDatos()">
-            </div>
-            <div>
-                <label>Deuda Actual ($)</label>
-                <input type="number" id="deudaTdc" placeholder="Ej. 1200" onchange="guardarDatos()">
-            </div>
-            <div>
-                <label>Día de Corte</label>
-                <input type="number" id="diaCorte" placeholder="Ej. 15" min="1" max="31" onchange="guardarDatos()">
-            </div>
-            <div>
-                <label>Día de Pago</label>
-                <input type="number" id="diaPago" placeholder="Ej. 5" min="1" max="31" onchange="guardarDatos()">
-            </div>
+<div class="app-container">
+    
+    <!-- HEADER: BALANCE TOTAL -->
+    <div class="balance-header">
+        <div class="balance-label">Efectivo Disponible</div>
+        <div class="balance-amount">$<span id="displaySaldo">0.00</span></div>
+        <div class="balance-input-wrapper">
+            <span style="color: var(--text-muted);">Editar: $</span>
+            <input type="number" id="saldoDebito" placeholder="0" oninput="actualizarSaldoVisual()" onchange="guardarDatos()">
         </div>
     </div>
 
-    <!-- SECCIÓN 3: COMPRAS A MESES (MSI) -->
-    <div class="card">
-        <h2 id="tituloMsiVisual">🗓️ Compras a Meses (Nu)</h2>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Registra tus compras a meses. Cambia de tarjeta arriba para ver las compras de cada una.</p>
+    <!-- SELECTOR DE TARJETAS -->
+    <div class="segment-control">
+        <div id="btnNu" class="segment-btn active nu" onclick="cambiarPestana('Nu')">Nu</div>
+        <div id="btnMP" class="segment-btn" onclick="cambiarPestana('MP')">Mercado Pago</div>
+    </div>
+
+    <!-- TARJETA DE CRÉDITO (DISEÑO FÍSICO) -->
+    <div id="visualCard" class="credit-card-visual">
+        <div class="card-chip"></div>
         
-        <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px dashed var(--border);">
-            <label style="margin-top:0;">¿Qué compraste?</label>
-            <input type="text" id="msiConcepto" placeholder="Ej. Llantas, Laptop...">
-            
-            <div class="grid-2">
-                <div>
-                    <label>Monto Total ($)</label>
-                    <input type="number" id="msiTotal" placeholder="Ej. 3000">
-                </div>
-                <div>
-                    <label>¿A cuántos meses?</label>
-                    <input type="number" id="msiPlazo" placeholder="Ej. 6">
-                </div>
+        <div class="card-inputs-grid">
+            <div class="card-input-group">
+                <label>Límite Total</label>
+                <input type="number" id="limiteTdc" placeholder="$0.00" onchange="guardarDatos()">
             </div>
-            <button class="btn-primary" onclick="agregarMSI()" style="margin-top: 15px;">Añadir Compra a Meses</button>
-        </div>
-
-        <div class="msi-list" id="listaMSI"></div>
-
-        <div class="summary-box" id="msiResumen" style="display: none;">
-            <span>Carga Mensual Fija en esta Tarjeta:</span>
-            <div class="big-number" id="msiTotalMensual">$0.00</div>
+            <div class="card-input-group">
+                <label>Deuda Actual</label>
+                <input type="number" id="deudaTdc" placeholder="$0.00" onchange="guardarDatos()">
+            </div>
+            <div class="card-input-group">
+                <label>Día Corte</label>
+                <input type="number" id="diaCorte" placeholder="Ej. 3" onchange="guardarDatos()">
+            </div>
+            <div class="card-input-group">
+                <label>Día Pago</label>
+                <input type="number" id="diaPago" placeholder="Ej. 13" onchange="guardarDatos()">
+            </div>
         </div>
     </div>
 
-    <!-- SECCIÓN 4: EL ASESOR IA -->
-    <div class="card ia-section">
-        <h2 style="color: #a855f7;">🧠 Consulta al Asesor Estricto</h2>
+    <!-- COMPRAS A MESES -->
+    <h3 class="section-title">Meses sin Intereses</h3>
+    
+    <!-- Formulario de nueva compra -->
+    <div style="background: var(--surface); padding: 20px; border-radius: 16px;">
+        <div class="input-group">
+            <input type="text" id="msiConcepto" class="fintech-input" placeholder="¿Qué compraste? (Ej. Audífonos)">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <input type="number" id="msiTotal" class="fintech-input" placeholder="Monto ($)">
+            <input type="number" id="msiPlazo" class="fintech-input" placeholder="Meses (Ej. 6)">
+        </div>
+        <button class="btn-premium" onclick="agregarMSI()">Agregar Compra</button>
+    </div>
+
+    <!-- Lista de transacciones -->
+    <div class="transaction-list" id="listaMSI"></div>
+
+    <!-- Carga Mensual Total -->
+    <div class="carga-mensual-box" id="msiResumen" style="display: none;">
+        <div class="carga-label">Carga Mensual<br>en esta tarjeta</div>
+        <div class="carga-val" id="msiTotalMensual">$0.00</div>
+    </div>
+
+
+    <!-- SECCIÓN IA -->
+    <div class="ia-container">
+        <div class="ia-header">
+            <span style="font-size: 24px;">🧠</span>
+            <h2>Asesor Financiero</h2>
+        </div>
         
-        <div class="api-config">
-            <label style="color: #a855f7; margin-top: 0;">🔑 Llave de Conexión (API Key Gemini)</label>
-            <input type="password" id="apiKey" placeholder="Pega aquí tu API Key" onchange="guardarDatos()">
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 0;">Se guarda solo en tu celular. Tu código es seguro.</p>
+        <div class="input-group">
+            <label style="color: #a855f7;">Llave API de Gemini</label>
+            <input type="password" id="apiKey" class="fintech-input" placeholder="Pega tu API Key aquí" onchange="guardarDatos()">
         </div>
 
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">El Asesor analizará AMBAS tarjetas al mismo tiempo y te dirá cuál te conviene usar para tu compra.</p>
-        
-        <!-- Selector de Personalidad -->
-        <div style="margin-top: 15px; margin-bottom: 15px;">
-            <label style="color: #a855f7; display: inline-block; margin-right: 10px; margin-top: 0;">Actitud del Asesor:</label>
-            <select id="nivelAgresividad" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); outline: none; font-weight: bold;">
-                <option value="amable">😊 Amable y Paciente</option>
-                <option value="estricto" selected>🧐 Estricto (Contador)</option>
-                <option value="sargento">🤬 Sargento Despiadado</option>
+        <div class="input-group">
+            <label>Personalidad del Asesor</label>
+            <select id="nivelAgresividad" class="fintech-input">
+                <option value="amable">Amable y Empático</option>
+                <option value="estricto" selected>Contador Estricto</option>
+                <option value="sargento">Sargento Despiadado</option>
             </select>
         </div>
-        
-        <!-- Caja de texto con Micrófono integrado -->
-        <div style="position: relative; margin-top: 10px;">
-            <textarea id="preguntaIA" placeholder="Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?"></textarea>
-            <button id="btnVoz" onclick="iniciarDictado()" style="position: absolute; right: 10px; bottom: 15px; width: 45px; height: 45px; margin: 0; padding: 0; border-radius: 50%; background-color: #3b82f6; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-size: 20px;">🎙️</button>
+
+        <div class="mic-container">
+            <textarea id="preguntaIA" class="fintech-input" style="min-height: 100px; padding-right: 50px; resize: none;" placeholder="Ej. ¿Me conviene comprar unos Galaxy Buds de $3,400 a 10 MSI?"></textarea>
+            <button id="btnVoz" class="mic-btn" onclick="iniciarDictado()">🎙️</button>
         </div>
+
+        <button class="btn-premium btn-ia-action" id="btnPreguntar" onclick="preguntarIA()">Pedir Análisis</button>
         
-        <button class="btn-ia" id="btnPreguntar" onclick="preguntarIA()">Consultar al Asesor</button>
-        
-        <div id="respuestaIA"></div>
+        <div id="respuestaIA" class="chat-bubble"></div>
     </div>
 
 </div>
 
 <script>
-    // --- BASE DE DATOS LOCAL MULTI-TARJETA ---
     let tarjetaActual = 'Nu';
     let datosFinancieros = JSON.parse(localStorage.getItem('ia_finanzas_v2')) || {
         saldoDebito: '', apiKey: '',
@@ -236,31 +312,28 @@
         }
     };
 
+    function actualizarSaldoVisual() {
+        let saldo = document.getElementById('saldoDebito').value;
+        document.getElementById('displaySaldo').innerText = saldo ? parseFloat(saldo).toLocaleString('es-MX', {minimumFractionDigits: 2}) : "0.00";
+    }
+
     function cambiarPestana(tarjeta) {
         guardarDatos();
         tarjetaActual = tarjeta;
         
         let btnNu = document.getElementById('btnNu');
         let btnMP = document.getElementById('btnMP');
-        let cardTdc = document.getElementById('cardTdc');
-        let tituloTarjeta = document.getElementById('tituloTarjetaVisual');
-        let tituloMsi = document.getElementById('tituloMsiVisual');
+        let visualCard = document.getElementById('visualCard');
 
-        btnNu.classList.remove('activa', 'nu');
-        btnMP.classList.remove('activa', 'mp');
+        btnNu.classList.remove('active', 'nu');
+        btnMP.classList.remove('active', 'mp');
         
         if(tarjeta === 'Nu') {
-            btnNu.classList.add('activa', 'nu');
-            cardTdc.style.borderLeftColor = '#8b5cf6';
-            tituloTarjeta.innerText = 'Datos de Nu';
-            tituloTarjeta.style.color = '#8b5cf6';
-            tituloMsi.innerText = '🗓️ Compras a Meses (Nu)';
+            btnNu.classList.add('active', 'nu');
+            visualCard.classList.remove('mp-style');
         } else {
-            btnMP.classList.add('activa', 'mp');
-            cardTdc.style.borderLeftColor = '#3b82f6';
-            tituloTarjeta.innerText = 'Datos de Mercado Pago';
-            tituloTarjeta.style.color = '#3b82f6';
-            tituloMsi.innerText = '🗓️ Compras a Meses (Mercado Pago)';
+            btnMP.classList.add('active', 'mp');
+            visualCard.classList.add('mp-style');
         }
 
         cargarDatosEnInputs();
@@ -269,6 +342,7 @@
 
     function cargarUI() {
         document.getElementById('saldoDebito').value = datosFinancieros.saldoDebito;
+        actualizarSaldoVisual();
         document.getElementById('apiKey').value = datosFinancieros.apiKey || '';
         cargarDatosEnInputs();
         renderMSI();
@@ -284,6 +358,7 @@
 
     function guardarDatos() {
         datosFinancieros.saldoDebito = document.getElementById('saldoDebito').value;
+        actualizarSaldoVisual();
         datosFinancieros.apiKey = document.getElementById('apiKey').value;
         
         let t = datosFinancieros.tarjetas[tarjetaActual];
@@ -295,14 +370,13 @@
         localStorage.setItem('ia_finanzas_v2', JSON.stringify(datosFinancieros));
     }
 
-    // --- LÓGICA DE MESES SIN INTERESES ---
     function agregarMSI() {
         let concepto = document.getElementById('msiConcepto').value.trim();
         let total = parseFloat(document.getElementById('msiTotal').value);
         let plazo = parseInt(document.getElementById('msiPlazo').value);
 
         if(concepto === '' || isNaN(total) || isNaN(plazo) || total <= 0 || plazo <= 0) {
-            alert("Por favor llena bien los datos de la compra a meses."); return;
+            alert("Completa bien los datos de la compra."); return;
         }
 
         let pagoMensual = total / plazo;
@@ -314,7 +388,7 @@
     }
 
     function borrarMSI(index) {
-        if(confirm("¿Ya liquidaste esta compra a meses?")) {
+        if(confirm("¿Eliminar esta compra?")) {
             datosFinancieros.tarjetas[tarjetaActual].msi.splice(index, 1);
             guardarDatos(); renderMSI();
         }
@@ -330,93 +404,83 @@
 
         if(msiActual.length === 0) { resumen.style.display = 'none'; return; }
 
-        let colorAcento = tarjetaActual === 'Nu' ? '#8b5cf6' : '#3b82f6';
+        let colorAcento = tarjetaActual === 'Nu' ? 'var(--nu-color)' : 'var(--mp-color)';
 
         msiActual.forEach((item, index) => {
             sumaMensual += item.pagoMensual;
             contenedor.innerHTML += `
-                <div class="msi-item" style="border-left-color: ${colorAcento};">
-                    <div class="msi-info"><h4>${item.concepto}</h4><p>Deuda Total: $${item.total.toFixed(2)} a ${item.plazo} meses</p></div>
-                    <div style="text-align: right;"><div class="msi-amount">-$${item.pagoMensual.toFixed(2)} /mes</div>
-                        <button onclick="borrarMSI(${index})" style="background: none; color: var(--text-muted); border: none; font-size: 12px; margin: 0; padding: 5px 0 0 0; width: auto; font-weight: normal;">🗑️ Quitar</button>
+                <div class="transaction-item">
+                    <div class="t-info">
+                        <h4>${item.concepto}</h4>
+                        <p>$${item.total.toFixed(2)} a ${item.plazo} meses</p>
+                    </div>
+                    <div class="t-amount">
+                        <div class="t-amount-val">-$${item.pagoMensual.toFixed(2)}</div>
+                        <button class="t-amount-btn" onclick="borrarMSI(${index})">Eliminar</button>
                     </div>
                 </div>`;
         });
-        resumen.style.display = 'block'; 
-        totalMensual.innerText = `$${sumaMensual.toFixed(2)}`;
+        resumen.style.display = 'flex'; 
+        totalMensual.innerText = `$${sumaMensual.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
         totalMensual.style.color = colorAcento;
-        resumen.style.backgroundColor = tarjetaActual === 'Nu' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)';
-        resumen.style.borderColor = tarjetaActual === 'Nu' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)';
     }
 
-    // --- CEREBRO IA (CONEXIÓN CON GEMINI) ---
     async function preguntarIA() {
         guardarDatos(); 
         let pregunta = document.getElementById('preguntaIA').value.trim();
         let apiKey = document.getElementById('apiKey').value.trim();
         let nivel = document.getElementById('nivelAgresividad').value;
 
-        if(!apiKey) { alert("⚠️ Primero debes pegar tu API Key en la configuración de arriba."); return; }
-        if(!pregunta) { alert("Escribe qué es lo que quieres comprar o preguntar."); return; }
+        if(!apiKey) { alert("Pega tu API Key en la configuración."); return; }
+        if(!pregunta) { alert("Escribe tu pregunta."); return; }
 
         let btn = document.getElementById('btnPreguntar');
         let respDiv = document.getElementById('respuestaIA');
         
-        btn.innerText = "Calculando respuesta...";
+        btn.innerText = "Analizando...";
         btn.disabled = true;
         respDiv.style.display = 'block';
-        respDiv.innerHTML = "<i>Analizando tus números...</i>";
+        respDiv.innerHTML = "<i>Conectando con el asesor...</i>";
 
         let Nu = datosFinancieros.tarjetas.Nu;
         let MP = datosFinancieros.tarjetas.MP;
-        
         let cargaNu = Nu.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
         let cargaMP = MP.msi.reduce((sum, item) => sum + item.pagoMensual, 0);
 
-        // 🎭 DEFINIR LA PERSONALIDAD MÚLTIPLE
         let personalidad = "";
         if (nivel === "amable") {
-            personalidad = "Eres un asesor financiero muy amable, empático, motivador y paciente. Hablas en español de México. Tu objetivo es educar y guiar suavemente sin regañar. Si la compra es mala idea, aconséjale con cariño y dale ánimos para organizar sus finanzas.";
+            personalidad = "Eres un asesor financiero amable y empático. Hablas en español de México. Guías suavemente sin regañar.";
         } else if (nivel === "estricto") {
-            personalidad = "Eres un asesor financiero experto, muy estricto, analítico y un poco regañón. Hablas en español de México. Eres directo y usas sus propios números para evidenciar sus errores.";
+            personalidad = "Eres un asesor financiero estricto y analítico. Hablas en español de México. Eres directo y usas sus números para evidenciar errores.";
         } else if (nivel === "sargento") {
-            personalidad = "Eres un sargento militar financiero, brutalmente honesto, sarcástico, despiadado y usas un tono muy agresivo (sin groserías extremas). Hablas en español de México. Haces sentir al usuario que sus malas decisiones financieras son un desastre total y te burlas de sus caprichos destructivos.";
+            personalidad = "Eres un sargento militar financiero, brutalmente honesto y sarcástico. Hablas en español de México. Haces sentir que sus malas decisiones son un desastre.";
         }
 
-        // 🧠 EL PROMPT CON LA PERSONALIDAD INYECTADA
         let promptMaestro = `${personalidad}
-El usuario te pregunta lo siguiente sobre una posible compra o movimiento: "${pregunta}"
+Pregunta: "${pregunta}"
 
-Considera estos datos financieros actuales del usuario:
-- Dinero a favor (Débito/Efectivo): $${datosFinancieros.saldoDebito || 0}
+Datos:
+- Efectivo: $${datosFinancieros.saldoDebito || 0}
+NU: Límite $${Nu.limiteTdc || 0} | Deuda $${Nu.deudaTdc || 0} | Corte ${Nu.diaCorte || '?'} | Carga MSI $${cargaNu.toFixed(2)}
+MP: Límite $${MP.limiteTdc || 0} | Deuda $${MP.deudaTdc || 0} | Corte ${MP.diaCorte || '?'} | Carga MSI $${cargaMP.toFixed(2)}
 
-TARJETA NU:
-- Límite: $${Nu.limiteTdc || 0} | Deuda actual: $${Nu.deudaTdc || 0}
-- Día de corte: ${Nu.diaCorte || 'No definido'} | Carga mensual por MSI: $${cargaNu.toFixed(2)}
-
-TARJETA MERCADO PAGO:
-- Límite: $${MP.limiteTdc || 0} | Deuda actual: $${MP.deudaTdc || 0}
-- Día de corte: ${MP.diaCorte || 'No definido'} | Carga mensual por MSI: $${cargaMP.toFixed(2)}
-
-INSTRUCCIONES PARA TU RESPUESTA:
-1. Haz un análisis matemático considerando qué tarjeta le conviene más por sus días de corte y límite disponible.
-2. Si la compra es mala idea, usa tu personalidad (${nivel}) para decirle por qué.
-3. Si la compra es viable, dile EXACTAMENTE con qué tarjeta pagar.
-4. No uses saludos largos, ve directo al grano y formatea tu respuesta de forma limpia.`;
+INSTRUCCIONES:
+1. Analiza matemáticamente qué tarjeta conviene por días de corte y límite.
+2. Si es mala idea, usa tu personalidad (${nivel}) para decirle por qué.
+3. Si es buena idea, dile con qué tarjeta pagar.
+4. Formatea con listas y negritas, sin saludos largos.`;
 
         try {
             let response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptMaestro }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptMaestro }] }] })
             });
             
             let data = await response.json();
             
             if(data.error) {
-                respDiv.innerHTML = `<span style="color: #ef4444;">Error de Google: ${data.error.message}</span>`;
+                respDiv.innerHTML = `<span style="color: #FF453A;">Error: ${data.error.message}</span>`;
             } else {
                 let respuestaIA = data.candidates[0].content.parts[0].text;
                 respuestaIA = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -424,50 +488,27 @@ INSTRUCCIONES PARA TU RESPUESTA:
                 respDiv.innerHTML = respuestaIA;
             }
         } catch (error) {
-            respDiv.innerHTML = `<span style="color: #ef4444;">Error de conexión. Revisa tu internet o intenta de nuevo.</span>`;
+            respDiv.innerHTML = `<span style="color: #FF453A;">Error de conexión.</span>`;
         }
         
-        btn.innerText = "Consultar al Asesor";
+        btn.innerText = "Pedir Análisis";
         btn.disabled = false;
     }
 
-    // --- FUNCIÓN DE DICTADO POR VOZ ---
     function iniciarDictado() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("Tu navegador no soporta el dictado por voz. Intenta usar Google Chrome.");
-            return;
+            alert("No soportado. Usa Chrome."); return;
         }
-        
         let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = new SpeechRecognition();
-        
-        recognition.lang = 'es-MX';
-        recognition.interimResults = false;
+        recognition.lang = 'es-MX'; recognition.interimResults = false;
         
         let btnVoz = document.getElementById('btnVoz');
         let txtPregunta = document.getElementById('preguntaIA');
         
-        recognition.onstart = function() {
-            btnVoz.innerText = "🔴";
-            btnVoz.style.backgroundColor = "#ef4444";
-            txtPregunta.placeholder = "Te escucho fuerte y claro...";
-        };
-        
-        recognition.onresult = function(event) {
-            let textoDictado = event.results[0][0].transcript;
-            txtPregunta.value += (txtPregunta.value ? " " : "") + textoDictado;
-        };
-        
-        recognition.onerror = function(event) {
-            alert("Hubo un error al usar el micrófono. Asegúrate de darle permisos a la página.");
-        };
-        
-        recognition.onend = function() {
-            btnVoz.innerText = "🎙️";
-            btnVoz.style.backgroundColor = "#3b82f6";
-            txtPregunta.placeholder = "Ej. Quiero comprar unos Galaxy Buds de $3,400 a 10 MSI. ¿Con qué tarjeta los paso?";
-        };
-        
+        recognition.onstart = function() { btnVoz.innerText = "🔴"; btnVoz.style.background = "#FF453A"; };
+        recognition.onresult = function(event) { txtPregunta.value += (txtPregunta.value ? " " : "") + event.results[0][0].transcript; };
+        recognition.onend = function() { btnVoz.innerText = "🎙️"; btnVoz.style.background = "#a855f7"; };
         recognition.start();
     }
 
@@ -475,3 +516,4 @@ INSTRUCCIONES PARA TU RESPUESTA:
 </script>
 </body>
 </html>
+
