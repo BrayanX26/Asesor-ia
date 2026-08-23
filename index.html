@@ -9,11 +9,11 @@
     
     <style>
         :root {
-            --bg-base: #000000; /* Negro OLED puro */
-            --surface: #141414; /* Gris muy oscuro para tarjetas */
-            --surface-2: #222222; /* Para inputs */
+            --bg-base: #000000;
+            --surface: #141414;
+            --surface-2: #222222;
             --text-main: #FFFFFF;
-            --text-muted: #8E8E93; /* Gris estilo Apple */
+            --text-muted: #8E8E93;
             --nu-color: #820ad1; 
             --mp-color: #009EE3; 
             --danger: #FF453A; 
@@ -30,7 +30,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Luces de neón de fondo para que el glassmorphism resalte */
+        /* Luces de neón de fondo */
         body::before {
             content: ''; position: fixed; top: -10%; left: -20%; width: 500px; height: 500px;
             background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 60%);
@@ -48,6 +48,22 @@
             padding: 20px 20px 80px 20px;
         }
 
+        /* --- ANIMACIONES KEYFRAMES --- */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4); }
+            100% { box-shadow: 0 12px 35px rgba(168, 85, 247, 0.8); }
+        }
+
+        /* Clases para animación en cascada (Fade In) */
+        .anim-fade-1 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.1s; }
+        .anim-fade-2 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.3s; }
+        .anim-fade-3 { opacity: 0; animation: slideUpFade 0.6s ease forwards; animation-delay: 0.5s; }
+
         /* --- BALANCE PRINCIPAL --- */
         .balance-header {
             text-align: center;
@@ -61,8 +77,6 @@
             letter-spacing: 1px;
             font-weight: 600;
         }
-        
-        /* Efecto Metálico / Plateado */
         .balance-amount {
             font-size: 46px;
             font-weight: 800;
@@ -72,7 +86,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
         .balance-input-wrapper {
             display: inline-flex;
             align-items: center;
@@ -80,6 +93,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             padding: 5px 15px;
+            transition: all 0.3s ease;
         }
         .balance-input-wrapper input {
             background: transparent;
@@ -91,6 +105,7 @@
             width: 120px;
             padding: 5px;
             outline: none;
+            transition: all 0.3s ease;
         }
 
         /* --- SECCIONES GENERALES --- */
@@ -109,6 +124,7 @@
             padding: 4px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
         .segment-btn {
             flex: 1;
@@ -121,20 +137,20 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        /* Efecto de presión en botones de segmento */
+        .segment-btn:active { transform: scale(0.96); }
         .segment-btn.active.nu { background: var(--nu-color); color: white; }
         .segment-btn.active.mp { background: var(--mp-color); color: white; }
 
         /* --- LA TARJETA DE CRÉDITO VISUAL --- */
         .credit-card-visual {
-            /* Degradado elegante de Nu */
             background: linear-gradient(135deg, #b026ff 0%, #5d00ff 100%);
             border-radius: 20px;
             padding: 25px;
             position: relative;
             overflow: hidden;
-            /* Resplandor (Glow) morado */
             box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
-            transition: all 0.4s ease;
+            transition: all 0.4s ease; /* Transición un poco más larga para colores */
         }
         .credit-card-visual.mp-style {
             background: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
@@ -158,18 +174,19 @@
             display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
         }
         
-        /* Inputs "hundidos" dentro de la tarjeta */
+        /* Inputs hundidos */
         .card-input-group input {
             width: 100%; 
             background: rgba(0, 0, 0, 0.25); 
             border: 1px solid rgba(255,255,255,0.1); 
             color: #ffffff;
             border-radius: 8px; padding: 10px; font-size: 16px; font-weight: 600;
-            box-sizing: border-box; outline: none; transition: border 0.3s;
+            box-sizing: border-box; outline: none; 
+            transition: all 0.3s ease;
         }
         .card-input-group input:focus { border-color: rgba(255,255,255,0.5); }
 
-        /* --- EFECTO GLASSMORPHISM PARA PANELES INFERIORES --- */
+        /* --- EFECTO GLASSMORPHISM --- */
         .glass-panel {
             background-color: rgba(25, 25, 30, 0.6);
             backdrop-filter: blur(12px);
@@ -177,6 +194,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         /* --- INPUTS GLOBALES --- */
@@ -187,7 +205,8 @@
             background: rgba(0,0,0,0.3); 
             border: 1px solid rgba(255,255,255,0.05); 
             color: white;
-            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; transition: all 0.3s;
+            border-radius: 12px; padding: 16px; font-size: 15px; box-sizing: border-box; outline: none; 
+            transition: all 0.3s ease;
         }
         .fintech-input:focus { border-color: rgba(168, 85, 247, 0.5); background: rgba(0,0,0,0.5); }
         
@@ -195,15 +214,16 @@
         .btn-premium {
             width: 100%; background: white; color: black; border: none;
             border-radius: 30px; padding: 16px; font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
-        .btn-premium:active { transform: scale(0.97); }
+        /* Efecto de presión en botones principales */
+        .btn-premium:active { transform: scale(0.96); }
         
-        /* Botón de IA con glow */
+        /* Botón de IA con animación Pulse Glow */
         .btn-ia-action { 
             background: linear-gradient(135deg, #b026ff, #5d00ff); 
             color: white; 
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+            animation: pulseGlow 2s infinite alternate;
         }
 
         /* --- LISTA DE TRANSACCIONES (MSI) --- */
@@ -211,12 +231,13 @@
         .transaction-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
         }
         .t-info h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
         .t-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
         .t-amount { text-align: right; }
         .t-amount-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
-        .t-amount-btn { background: none; border: none; color: var(--danger); font-size: 12px; padding: 4px 0 0 0; cursor: pointer; font-weight: 600; }
+        .t-amount-btn { background: none; border: none; color: var(--danger); font-size: 12px; padding: 4px 0 0 0; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
 
         .carga-mensual-box {
             display: flex; justify-content: space-between; align-items: center; margin-top: 15px;
@@ -228,7 +249,6 @@
         /* --- SECCIÓN IA --- */
         .ia-container {
             margin-top: 40px; 
-            /* Se aplica el glass panel automático por la clase HTML */
         }
         .ia-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .ia-header h2 { margin: 0; font-size: 18px; color: white; }
@@ -236,6 +256,7 @@
         .chat-bubble {
             background: rgba(168, 85, 247, 0.1); border-radius: 16px; border-bottom-left-radius: 4px;
             padding: 15px; margin-top: 20px; font-size: 15px; line-height: 1.5; display: none; border: 1px solid rgba(168, 85, 247, 0.3);
+            transition: all 0.3s ease;
         }
 
         /* Micrófono flotante */
@@ -244,9 +265,10 @@
             position: absolute; right: 10px; bottom: 10px; width: 42px; height: 42px;
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white;
             font-size: 18px; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; backdrop-filter: blur(5px); transition: background 0.3s;
+            cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s ease;
         }
         .mic-btn:hover { background: rgba(168, 85, 247, 0.4); }
+        .mic-btn:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
@@ -254,7 +276,7 @@
 <div class="app-container">
     
     <!-- HEADER: BALANCE TOTAL -->
-    <div class="balance-header">
+    <div class="balance-header anim-fade-1">
         <div class="balance-label">Efectivo Disponible</div>
         <div class="balance-amount">$<span id="displaySaldo">0.00</span></div>
         <div class="balance-input-wrapper">
@@ -264,13 +286,13 @@
     </div>
 
     <!-- SELECTOR DE TARJETAS -->
-    <div class="segment-control">
+    <div class="segment-control anim-fade-1">
         <div id="btnNu" class="segment-btn active nu" onclick="cambiarPestana('Nu')">Nu</div>
         <div id="btnMP" class="segment-btn" onclick="cambiarPestana('MP')">Mercado Pago</div>
     </div>
 
     <!-- TARJETA DE CRÉDITO (DISEÑO FÍSICO) -->
-    <div id="visualCard" class="credit-card-visual">
+    <div id="visualCard" class="credit-card-visual anim-fade-1">
         <div class="card-chip"></div>
         
         <div class="card-inputs-grid">
@@ -294,9 +316,9 @@
     </div>
 
     <!-- COMPRAS A MESES (NUEVO PANEL GLASSMORPHISM) -->
-    <h3 class="section-title">Meses sin Intereses</h3>
+    <h3 class="section-title anim-fade-2">Meses sin Intereses</h3>
     
-    <div class="glass-panel">
+    <div class="glass-panel anim-fade-2">
         <div class="input-group">
             <input type="text" id="msiConcepto" class="fintech-input" placeholder="¿Qué compraste? (Ej. Audífonos)">
         </div>
@@ -311,7 +333,7 @@
     </div>
 
     <!-- Carga Mensual Total -->
-    <div class="glass-panel" id="msiResumen" style="display: none; margin-top: 15px;">
+    <div class="glass-panel anim-fade-2" id="msiResumen" style="display: none; margin-top: 15px;">
         <div class="carga-mensual-box" style="margin-top: 0;">
             <div class="carga-label">Carga Mensual<br>en esta tarjeta</div>
             <div class="carga-val" id="msiTotalMensual">$0.00</div>
@@ -320,7 +342,7 @@
 
 
     <!-- SECCIÓN IA (NUEVO PANEL GLASSMORPHISM) -->
-    <div class="glass-panel ia-container">
+    <div class="glass-panel ia-container anim-fade-3">
         <div class="ia-header">
             <span style="font-size: 24px;">🧠</span>
             <h2>Asesor Financiero</h2>
